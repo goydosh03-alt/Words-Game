@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Stellar Words</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;background:#04060f;display:flex;justify-content:center;align-items:center}
+#starCanvas{position:fixed;inset:0;z-index:0;width:100%;height:100%}
+
+.phone{position:relative;z-index:1;width:390px;height:844px;overflow:hidden}
+@media(max-width:420px){.phone{width:100vw;height:100dvh}}
+
+/* ────────────────────────────────
+   BOTTOM NAV BAR — Floating Pill (iOS 18 style)
+──────────────────────────────── */
+.nav-bar{
+  position:absolute;
+  bottom:22px;
+  left:18px;right:18px;
+  height:62px;
+  z-index:50;
+
+  /* Чистий glass — нуль заливки, тільки blur */
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(32px) saturate(1.9) brightness(1.06);
+  -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.06);
+
+  border-radius:36px;
+  border:1px solid rgba(255,255,255,0.13);
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.18),
+    inset 0 1.5px 0 rgba(255,255,255,0.20),
+    inset 0 -1px 0 rgba(255,255,255,0.04);
+
+  display:flex;
+  align-items:center;
+  padding:5px 6px;
+
+  transition:transform .38s cubic-bezier(.77,0,.18,1),
+             opacity .32s ease;
+}
+/* Стан приховування (підсторінки) */
+.nav-bar.nav-hidden{
+  transform:translateY(130%);
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Each tab item */
+.nav-item{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;
+  gap:2px;
+  cursor:pointer;
+  padding:7px 4px 6px;
+  border-radius:28px;
+  transition:background .2s ease,transform .15s ease;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+}
+
+/* Active item — glass inner pill */
+.nav-item.active{
+  background:rgba(130,90,255,0.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.14),0 0 12px rgba(120,80,255,0.15);
+  border:1px solid rgba(160,120,255,0.22);
+}
+
+.nav-item:active{transform:scale(.93);}
+
+/* Icon */
+.nav-icon{
+  width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+
+.nav-icon-img{
+  font-size:21px;line-height:1;display:block;
+  transition:filter .2s ease,transform .2s ease;
+  /* inactive — desaturated, dim */
+  filter:grayscale(.7) brightness(.52) opacity(.72);
+}
+.nav-item.active .nav-icon-img{
+  filter:none;
+  transform:scale(1.08);
+}
+
+/* Label */
+.nav-label{
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:-0.2px;
+  color:rgba(235,235,245,0.32);
+  transition:color .2s ease;
+  font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;
+  white-space:nowrap;
+  line-height:1;
+}
+.nav-item.active .nav-label{
+  color:rgba(168,130,255,1);
+  font-weight:600;
+}
+
+/* ────────────────────────────────
+   TAB SCREENS (sit above nav bar)
+──────────────────────────────── */
+.tab-layer{
+  /* full height — pill floats OVER content, scroll padding handles clearance */
+  position:absolute;inset:0;overflow:hidden;
+}
+.tab{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  transition:opacity .28s ease,transform .28s ease;
+  overflow:hidden;
+}
+.tab.hidden{opacity:0;pointer-events:none;transform:translateY(6px)}
+.tab.active{opacity:1;pointer-events:all;transform:translateY(0)}
+
+/* Shared bg */
+.space-bg-grad{
+  position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 35% 5%,rgba(90,25,180,.26) 0%,transparent 50%),
+             radial-gradient(ellipse at 75% 90%,rgba(8,55,160,.18) 0%,transparent 45%),#04060f;
+}
+.map-nebula{position:absolute;border-radius:50%;filter:blur(70px);opacity:.13;pointer-events:none}
+.mn1{width:340px;height:280px;top:-60px;left:-80px;background:rgba(100,30,200,1)}
+.mn2{width:300px;height:300px;bottom:-80px;right:-70px;background:rgba(20,80,200,1)}
+
+/* ────────────────────────────────
+   OVERLAY SCREENS (full screen)
+──────────────────────────────── */
+.overlay{
+  position:absolute;inset:0;z-index:40;
+  display:flex;flex-direction:column;
+  transition:transform .52s cubic-bezier(.77,0,.18,1),opacity .42s ease;
+  will-change:transform;
+}
+.overlay.off-r{transform:translateX(100%);opacity:0;pointer-events:none}
+.overlay.on{transform:translateX(0);opacity:1}
+
+/* ════════════════════════════════
+   TAB 1 — PLANETS MAP
+════════════════════════════════ */
+.tab-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:106px}
+.tab-scroll::-webkit-scrollbar{display:none}
+
+.map-header{
+  position:relative;z-index:2;
+  padding:52px 20px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.map-logo{
+  font-size:20px;font-weight:800;
+  background:linear-gradient(135deg,#fff 0%,#c0a0ff 55%,#70c0ff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.map-coins{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,190,30,.1);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,190,30,.22);border-radius:20px;
+  padding:7px 12px;font-size:13px;font-weight:700;color:#ffd060;
+}
+
+.daily-banner{
+  position:relative;z-index:2;margin:0 18px 12px;padding:14px 16px;
+  background:linear-gradient(135deg,rgba(120,60,255,.2),rgba(60,120,255,.14));
+  backdrop-filter:blur(16px);border:1px solid rgba(140,100,255,.28);border-radius:18px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .2s;
+}
+.daily-banner:active{transform:scale(.97)}
+.daily-icon{font-size:26px;flex-shrink:0}
+.daily-text{flex:1;min-width:0}
+.daily-title{font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daily-sub{font-size:11px;color:rgba(255,255,255,.42);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daily-timer-pill{font-size:12px;font-weight:700;color:#a080ff;background:rgba(120,80,255,.14);border-radius:10px;padding:4px 8px;white-space:nowrap}
+
+/* Planet list */
+.galaxy-path{position:relative;padding:6px 0 24px}
+
+.prow{
+  position:relative;z-index:1;
+  display:flex;align-items:center;padding:14px 18px;cursor:pointer;
+}
+.prow:nth-child(even){flex-direction:row-reverse}
+.prow.locked{cursor:default}
+.p-orb{position:relative;width:86px;height:86px;flex-shrink:0}
+.p-body{
+  width:86px;height:86px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:38px;
+  position:relative;overflow:hidden;
+  box-shadow:0 10px 40px rgba(0,0,0,.72),0 3px 10px rgba(0,0,0,.5),inset 0 -8px 20px rgba(0,0,0,.45);
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.p-body::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 68% 72%,rgba(0,0,0,.52) 0%,transparent 55%);z-index:1}
+.p-body::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.48) 0%,rgba(255,255,255,.14) 32%,transparent 58%);z-index:2}
+.prow.unlocked .p-body:active{transform:scale(.9)}
+.prow.locked .p-body{filter:grayscale(.75) brightness(.4)}
+.p-glow{position:absolute;top:50%;left:50%;width:114px;height:114px;border-radius:50%;transform:translate(-50%,-50%);filter:blur(12px);opacity:0;pointer-events:none}
+.prow.unlocked .p-glow{opacity:.8;animation:pglow 3.5s ease-in-out infinite}
+@keyframes pglow{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.2)}}
+.p-ring{position:absolute;top:50%;left:50%;width:124px;height:30px;border:2px solid rgba(255,255,255,.11);border-radius:50%;transform:translate(-50%,-50%) rotateX(74deg);pointer-events:none}
+.p-stars{display:flex;gap:3px;position:absolute;bottom:-18px;left:50%;transform:translateX(-50%)}
+.ps{font-size:13px;filter:grayscale(1) brightness(.4)}
+.ps.on{filter:none;text-shadow:0 0 10px rgba(255,200,50,.9)}
+.p-card{
+  flex:1;min-width:0;
+  background:rgba(255,255,255,.055);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;
+  padding:12px 14px;margin:0 12px;
+}
+.p-card-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-card-desc{font-size:11px;color:rgba(255,255,255,.37);line-height:1.44}
+.p-challenges{display:flex;gap:5px;margin-top:8px}
+.ch-pill{font-size:10px;font-weight:600;padding:3px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.42);background:rgba(255,255,255,.04);cursor:pointer}
+.ch-pill.done{color:#60d080;border-color:rgba(80,200,100,.28);background:rgba(60,180,80,.07)}
+.ch-pill.active{color:#ffb040;border-color:rgba(255,160,40,.3);background:rgba(255,140,20,.08)}
+.p-card-tag{display:inline-block;margin-top:7px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);border-radius:10px;padding:3px 9px;color:rgba(255,255,255,.38)}
+.prow.locked .p-card{opacity:.3}
+.lock-ic{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;z-index:3}
+
+/* ════════════════════════════════
+   TAB 2 — DAILY (redesigned)
+════════════════════════════════ */
+.tab-header{
+  position:relative;z-index:2;padding:52px 20px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.tab-title{font-size:20px;font-weight:800;color:#fff}
+.tab-coins{display:flex;align-items:center;gap:6px;background:rgba(255,190,30,.1);backdrop-filter:blur(14px);border:1px solid rgba(255,190,30,.22);border-radius:20px;padding:7px 12px;font-size:13px;font-weight:700;color:#ffd060}
+
+/* ── 1. STREAK HERO ── */
+.streak-hero{
+  position:relative;z-index:2;margin:0 18px 14px;
+  padding:22px 20px 18px;
+  background:linear-gradient(145deg,rgba(255,90,15,.16),rgba(255,140,30,.08) 60%,rgba(120,60,0,.04));
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,110,20,.24);
+  border-radius:24px;
+  overflow:hidden;
+}
+/* Glow blob inside card */
+.streak-hero::before{
+  content:'';position:absolute;top:-30px;right:-20px;
+  width:130px;height:130px;border-radius:50%;
+  background:rgba(255,100,20,.18);filter:blur(40px);pointer-events:none;
+}
+.sh-top{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.sh-flame{font-size:52px;animation:flameFloat 2.4s ease-in-out infinite;line-height:1}
+@keyframes flameFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.06)}}
+.sh-text{flex:1}
+.sh-count{font-size:44px;font-weight:800;color:#ff8040;line-height:1;letter-spacing:-1px}
+.sh-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.5px;margin-top:1px}
+.sh-msg{font-size:13px;color:rgba(255,255,255,.55);margin-top:6px;line-height:1.4}
+.sh-msg strong{color:#ffc060}
+/* Week dots */
+.sh-week{display:flex;gap:7px}
+.sh-dot{
+  flex:1;height:6px;border-radius:3px;
+  background:rgba(255,255,255,.1);
+  transition:background .3s;
+}
+.sh-dot.done{background:rgba(255,110,20,.7);}
+.sh-dot.today{background:#ffd060;box-shadow:0 0 8px rgba(255,200,30,.6);}
+/* Day labels under dots */
+.sh-days{display:flex;gap:7px;margin-top:5px}
+.sh-day-lbl{flex:1;text-align:center;font-size:9px;font-weight:600;color:rgba(255,255,255,.25);letter-spacing:.2px}
+.sh-day-lbl.done{color:rgba(255,140,40,.6)}
+.sh-day-lbl.today{color:#ffd060}
+
+/* ── 2. DAILY CHALLENGE CARD ── */
+.dc-main{
+  position:relative;z-index:2;margin:0 18px 14px;
+  padding:20px 18px;
+  background:linear-gradient(145deg,rgba(100,50,255,.22),rgba(50,100,255,.14));
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(140,100,255,.3);
+  border-radius:24px;overflow:hidden;cursor:pointer;
+}
+.dc-main::before{
+  content:'';position:absolute;bottom:-20px;right:-20px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(100,50,255,.2);filter:blur(36px);pointer-events:none;
+}
+/* Timer row — top of card */
+.dc-timer-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.dc-timer-badge{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;
+  color:#ff8060;background:rgba(255,80,40,.1);
+  border:1px solid rgba(255,80,40,.22);
+  border-radius:12px;padding:5px 10px;
+}
+.dc-timer-badge .dt-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#ff6040;
+  animation:dtPulse 1.2s ease-in-out infinite;
+}
+@keyframes dtPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.dc-badge-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  color:#a080ff;background:rgba(120,80,255,.15);
+  border-radius:8px;padding:4px 10px;
+}
+/* Planet + info row */
+.dc-body{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.dc-planet-icon{font-size:48px;line-height:1;filter:drop-shadow(0 0 16px rgba(40,120,255,.4))}
+.dc-body-text{flex:1;min-width:0}
+.dc-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:3px}
+.dc-sub{font-size:12px;color:rgba(255,255,255,.4);line-height:1.4}
+/* Reward chips */
+.dc-chips{display:flex;gap:6px;margin-bottom:16px}
+.dc-chip{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;
+  font-size:12px;font-weight:700;color:#fff;
+}
+.dc-chip-icon{font-size:14px}
+/* CTA button */
+.dc-cta{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,#7838ff,#4070ff);
+  border:none;border-radius:18px;
+  font-size:15px;font-weight:700;color:#fff;
+  cursor:pointer;letter-spacing:.3px;
+  box-shadow:0 0 28px rgba(100,60,255,.4),inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.dc-cta:active{transform:scale(.97);box-shadow:0 0 16px rgba(100,60,255,.3)}
+
+/* ── 3. 7-DAY REWARD TRACK ── */
+.section-title{
+  position:relative;z-index:2;
+  padding:0 18px 10px;
+  font-size:11px;font-weight:700;
+  color:rgba(255,255,255,.38);letter-spacing:1.2px;
+}
+.reward-track{
+  position:relative;z-index:2;
+  display:flex;gap:8px;
+  padding:0 18px 4px;
+  overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.reward-track::-webkit-scrollbar{display:none}
+.rt-item{
+  flex-shrink:0;width:68px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:12px 6px 10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
+  transition:all .2s ease;position:relative;
+}
+.rt-item.done{
+  background:rgba(80,200,100,.08);
+  border-color:rgba(80,200,100,.22);
+}
+.rt-item.today{
+  background:rgba(120,80,255,.16);
+  border-color:rgba(160,120,255,.4);
+  box-shadow:0 0 18px rgba(120,80,255,.2);
+}
+.rt-item.locked{opacity:.4}
+.rt-day{font-size:9px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.3)}
+.rt-item.done .rt-day{color:#60d080}
+.rt-item.today .rt-day{color:#c0a0ff}
+.rt-icon{font-size:22px;line-height:1}
+.rt-val{font-size:11px;font-weight:700;color:rgba(255,255,255,.6)}
+.rt-item.done .rt-val{color:#60d080}
+.rt-item.today .rt-val{color:#fff}
+/* checkmark on done */
+.rt-check{
+  position:absolute;top:-5px;right:-5px;
+  width:18px;height:18px;border-radius:50%;
+  background:#48c96a;border:2px solid rgba(4,6,15,.8);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:#fff;display:none;
+}
+.rt-item.done .rt-check{display:flex}
+
+/* ── 4. WEEK ACTIVITY ── */
+.week-activity{
+  position:relative;z-index:2;
+  margin:14px 18px 0;
+  padding:14px 16px;
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
+}
+.wa-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wa-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.45)}
+.wa-total{font-size:11px;color:rgba(255,255,255,.3)}
+.wa-dots{display:flex;gap:8px}
+.wa-dot{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.wa-dot-circle{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(255,255,255,.09);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all .2s;
+}
+.wa-dot.played .wa-dot-circle{
+  background:rgba(120,80,255,.2);
+  border-color:rgba(160,120,255,.4);
+  box-shadow:0 0 10px rgba(120,80,255,.2);
+}
+.wa-dot.today .wa-dot-circle{
+  background:linear-gradient(135deg,rgba(140,100,255,.4),rgba(80,140,255,.3));
+  border-color:rgba(180,150,255,.6);
+  box-shadow:0 0 14px rgba(140,100,255,.35);
+}
+.wa-dot-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,.22);letter-spacing:.3px}
+.wa-dot.played .wa-dot-lbl,.wa-dot.today .wa-dot-lbl{color:rgba(180,150,255,.6)}
+
+/* ════════════════════════════════
+   TAB 3 — QUESTS
+════════════════════════════════ */
+.quest-section{position:relative;z-index:2;padding:0 18px 6px}
+.qs-label{font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.35);margin-bottom:8px}
+.quest-card{
+  display:flex;align-items:center;gap:12px;padding:14px;
+  background:rgba(255,255,255,.05);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.08);border-radius:18px;margin-bottom:8px;
+}
+.quest-icon{font-size:26px;flex-shrink:0}
+.quest-body{flex:1;min-width:0}
+.quest-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
+.quest-desc{font-size:11px;color:rgba(255,255,255,.38)}
+.quest-progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:8px;overflow:hidden}
+.quest-bar{height:100%;border-radius:2px;transition:width .4s ease}
+.quest-reward{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#ffd060;flex-shrink:0}
+.quest-done{font-size:20px;flex-shrink:0}
+
+/* ════════════════════════════════
+   TAB 4 — PROFILE
+════════════════════════════════ */
+.profile-hero{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  padding:52px 20px 18px;
+}
+.profile-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(120,80,255,.5),rgba(60,120,255,.4));
+  border:2px solid rgba(160,130,255,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;margin-bottom:12px;
+  box-shadow:0 0 30px rgba(120,80,255,.25);
+}
+.profile-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:3px}
+.profile-level{font-size:12px;color:rgba(255,255,255,.4);background:rgba(120,80,255,.15);border:1px solid rgba(120,80,255,.25);border-radius:10px;padding:3px 10px}
+.xp-bar-wrap{width:100%;margin-top:14px;background:rgba(255,255,255,.07);border-radius:4px;height:6px;overflow:hidden}
+.xp-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#7840ff,#40a0ff);width:62%}
+.xp-label{font-size:10px;color:rgba(255,255,255,.3);margin-top:5px;text-align:center}
+
+.stats-grid{
+  position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin:0 18px 16px;
+}
+.stat-card{
+  padding:14px;background:rgba(255,255,255,.05);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.08);border-radius:18px;text-align:center;
+}
+.stat-icon{font-size:22px;margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:800;color:#fff}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px}
+
+.achievement-row{
+  position:relative;z-index:2;display:flex;gap:8px;
+  padding:0 18px 10px;overflow-x:auto;scrollbar-width:none;
+}
+.achievement-row::-webkit-scrollbar{display:none}
+.ach-item{
+  flex-shrink:0;width:70px;text-align:center;
+  padding:12px 8px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);border-radius:16px;
+}
+.ach-icon{font-size:24px;margin-bottom:4px}
+.ach-name{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;line-height:1.3}
+.ach-item.locked{opacity:.3}
+
+.settings-row{position:relative;z-index:2;margin:0 18px}
+.setting-item{
+  display:flex;align-items:center;gap:12px;padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;
+}
+.setting-item:last-child{border-bottom:none}
+.setting-icon{font-size:20px;width:32px;text-align:center}
+.setting-label{font-size:14px;color:rgba(255,255,255,.7);flex:1}
+.setting-arrow{font-size:12px;color:rgba(255,255,255,.25)}
+
+/* ════════════════════════════════
+   GAME OVERLAY
+════════════════════════════════ */
+.game-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:#04060f;background-size:cover;background-position:center bottom}
+.game-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,6,15,.62) 0%,rgba(4,6,15,.28) 40%,rgba(4,6,15,.54) 100%);z-index:1}
+.game-planet-far{position:absolute;z-index:2;top:-40px;right:-50px;width:260px;height:260px;border-radius:50%;opacity:.28;filter:blur(0px);pointer-events:none;box-shadow:inset -20px 20px 40px rgba(0,0,0,.5),inset 8px -8px 20px rgba(255,255,255,.08)}
+.game-planet-far-glow{position:absolute;z-index:2;top:-80px;right:-90px;width:380px;height:380px;border-radius:50%;filter:blur(44px);opacity:.42;pointer-events:none}
+.game-planet-tint-top{position:absolute;z-index:2;top:0;right:0;width:100%;height:45%;pointer-events:none}
+.planet-sphere{position:absolute;border-radius:50%;bottom:-78%;left:50%;transform:translateX(-50%);opacity:.34;filter:blur(0px);z-index:2;pointer-events:none}
+.planet-sphere::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 35%,transparent 55%),radial-gradient(circle at 68% 72%,rgba(0,0,0,.55) 0%,transparent 50%)}
+.planet-corona{position:absolute;border-radius:50%;bottom:-82%;left:50%;transform:translateX(-50%);filter:blur(42px);opacity:.55;z-index:2;pointer-events:none}
+.planet-ambient{position:absolute;bottom:0;left:0;right:0;height:46%;z-index:2;pointer-events:none}
+
+.game-nav{position:relative;z-index:3;padding:50px 18px 10px;display:flex;align-items:center;gap:10px}
+.back-btn{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.07);backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(255,255,255,.8);cursor:pointer;transition:transform .18s}
+.back-btn:active{transform:scale(.88)}
+.gn-info{flex:1;min-width:0}
+.gn-planet{font-size:17px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gn-sub{font-size:11px;color:rgba(255,255,255,.37);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.challenge-bar{position:relative;z-index:3;margin:0 18px 6px;padding:8px 14px;background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.09);border-radius:14px;display:flex;align-items:center;gap:10px}
+.challenge-bar.speed{border-color:rgba(255,180,30,.3);background:rgba(255,150,20,.08)}
+.challenge-bar.hard{border-color:rgba(255,60,60,.3);background:rgba(220,40,40,.08)}
+.challenge-bar.perfect{border-color:rgba(120,80,255,.3);background:rgba(100,60,255,.08)}
+.ch-label{font-size:11px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.5)}
+.ch-timer{font-size:15px;font-weight:800;color:#ffb040;letter-spacing:1px;margin-left:auto}
+.ch-timer.urgent{color:#ff5040;animation:timerPulse .6s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.gn-coins{display:flex;align-items:center;gap:6px;background:rgba(255,190,30,.1);backdrop-filter:blur(14px);border:1px solid rgba(255,190,30,.2);border-radius:18px;padding:6px 11px;font-size:13px;font-weight:700;color:#ffd060}
+
+/* Crossword */
+.constellation{position:relative;z-index:3;flex:1;display:flex;justify-content:center;align-items:center;padding:6px 16px 0;overflow:hidden;min-height:0}
+.cw-canvas{position:relative}
+.cw-slot{position:absolute;width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:rgba(255,255,255,.04);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:transparent;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.cw-slot.revealed{color:#fff;animation:slotIn .42s cubic-bezier(.34,1.56,.64,1) both}
+.cw-slot.revealed.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.25),rgba(160,70,15,.12));border-color:rgba(230,150,70,.42);text-shadow:0 0 14px rgba(255,160,60,.95),0 0 30px rgba(220,100,20,.5);box-shadow:0 0 18px rgba(210,110,30,.22),inset 0 1px 0 rgba(255,200,120,.18)}
+.cw-slot.revealed.t-venus{background:linear-gradient(145deg,rgba(210,170,30,.25),rgba(170,130,10,.12));border-color:rgba(240,210,80,.42);text-shadow:0 0 14px rgba(255,220,80,.95);box-shadow:0 0 18px rgba(210,170,30,.22),inset 0 1px 0 rgba(255,240,160,.18)}
+.cw-slot.revealed.t-earth{background:linear-gradient(145deg,rgba(30,110,220,.25),rgba(15,70,170,.12));border-color:rgba(70,150,255,.42);text-shadow:0 0 14px rgba(110,195,255,.95),0 0 30px rgba(50,130,255,.5);box-shadow:0 0 18px rgba(30,110,255,.22),inset 0 1px 0 rgba(150,215,255,.18)}
+.cw-slot.revealed.t-mars{background:linear-gradient(145deg,rgba(210,50,25,.25),rgba(170,25,10,.12));border-color:rgba(255,95,55,.42);text-shadow:0 0 14px rgba(255,125,75,.95);box-shadow:0 0 18px rgba(210,50,25,.22),inset 0 1px 0 rgba(255,180,140,.18)}
+@keyframes slotIn{0%{transform:scale(.5) translateY(-8px);opacity:0}65%{transform:scale(1.09) translateY(2px)}100%{transform:scale(1) translateY(0);opacity:1}}
+
+.bonus-toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,155,25,.15);backdrop-filter:blur(16px);border:1px solid rgba(255,155,25,.3);border-radius:20px;padding:8px 20px;font-size:13px;font-weight:700;color:#ffaa30;letter-spacing:1.5px;pointer-events:none;z-index:10;animation:bIn .35s cubic-bezier(.34,1.56,.64,1) forwards,bOut .3s ease 1.8s forwards}
+@keyframes bIn{from{opacity:0;transform:translate(-50%,-50%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes bOut{to{opacity:0;transform:translate(-50%,-60%)}}
+
+.gdiv{position:relative;z-index:3;height:1px;margin:4px 18px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent)}
+.cur-word-area{position:relative;z-index:3;display:flex;justify-content:center;align-items:center;padding:5px 18px;min-height:48px}
+.cur-letters{display:flex;gap:5px;align-items:center}
+.cur-l{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.09);backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;animation:lPop .15s cubic-bezier(.34,1.56,.64,1)}
+.cur-l.t-mercury{text-shadow:0 0 14px rgba(255,160,60,1);border-color:rgba(240,140,50,.5)}
+.cur-l.t-venus{text-shadow:0 0 14px rgba(255,220,80,1);border-color:rgba(240,210,70,.5)}
+.cur-l.t-earth{text-shadow:0 0 14px rgba(110,195,255,1);border-color:rgba(70,150,255,.5)}
+.cur-l.t-mars{text-shadow:0 0 14px rgba(255,125,75,1);border-color:rgba(255,95,55,.5)}
+@keyframes lPop{0%{transform:scale(.35);opacity:0}100%{transform:scale(1);opacity:1}}
+.cur-letters.shake{animation:shk .38s ease}
+@keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* Orb */
+.orb-wrap{position:relative;z-index:3;display:flex;justify-content:center;align-items:center;padding:2px 0 8px}
+.orb{position:relative;width:232px;height:232px;touch-action:none;user-select:none}
+.orb-ring{position:absolute;inset:-9px;border-radius:50%;animation:orbSpin 10s linear infinite;filter:blur(5px);opacity:.5;transition:background 1s ease,opacity .3s}
+.orb.active .orb-ring{opacity:.9}
+@keyframes orbSpin{to{transform:rotate(360deg)}}
+.orb-dome{position:absolute;inset:0;border-radius:50%;backdrop-filter:blur(32px) saturate(1.4);background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 40%,rgba(0,0,0,.06) 100%);border:1px solid rgba(255,255,255,.17);box-shadow:0 8px 40px rgba(0,0,0,.35),inset 0 1.5px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.15)}
+.orb-dome::before{content:'';position:absolute;top:8%;left:16%;width:36%;height:20%;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 60%,transparent);filter:blur(2px)}
+.orb-dome::after{content:'';position:absolute;bottom:10%;left:25%;width:50%;height:8%;border-radius:50%;background:linear-gradient(to top,rgba(255,255,255,.07),transparent);filter:blur(3px)}
+.orb-iglow{position:absolute;top:50%;left:50%;width:90px;height:90px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);transition:all .4s ease;pointer-events:none}
+.orb.active .orb-iglow{width:150px;height:150px}
+.orb-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
+.ln-solid{stroke-width:2.5;stroke-linecap:round;fill:none}
+.ln-dash{stroke-width:1.5;stroke-linecap:round;fill:none;stroke-dasharray:5 5}
+.lnode{position:absolute;width:50px;height:50px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;z-index:3;cursor:pointer;background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.88);box-shadow:0 4px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.17);transition:all .15s cubic-bezier(.34,1.56,.64,1)}
+.lnode.sel{border-color:rgba(200,160,255,.7);color:#fff;transform:translate(-50%,-50%) scale(1.17)}
+.lnode.sel.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.45),rgba(160,70,15,.3));box-shadow:0 0 22px rgba(210,110,30,.65),inset 0 1px 0 rgba(255,200,120,.25);text-shadow:0 0 12px rgba(255,170,70,1)}
+.lnode.sel.t-venus{background:linear-gradient(145deg,rgba(210,170,30,.45),rgba(170,130,10,.3));box-shadow:0 0 22px rgba(210,170,30,.65),inset 0 1px 0 rgba(255,240,140,.25);text-shadow:0 0 12px rgba(255,230,70,1)}
+.lnode.sel.t-earth{background:linear-gradient(145deg,rgba(30,110,220,.45),rgba(15,70,170,.3));box-shadow:0 0 22px rgba(50,130,255,.65),inset 0 1px 0 rgba(140,200,255,.25);text-shadow:0 0 12px rgba(110,195,255,1)}
+.lnode.sel.t-mars{background:linear-gradient(145deg,rgba(210,50,25,.45),rgba(170,25,10,.3));box-shadow:0 0 22px rgba(210,50,25,.65),inset 0 1px 0 rgba(255,175,135,.25);text-shadow:0 0 12px rgba(255,125,75,1)}
+
+.game-actions{position:relative;z-index:3;display:flex;justify-content:center;gap:12px;padding:0 18px 24px}
+.act-btn{flex:1;max-width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);border-radius:17px;padding:9px 6px;cursor:pointer;transition:transform .2s}
+.act-btn:active{transform:scale(.91)}
+.act-icon{font-size:21px}
+.act-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.5px}
+
+/* Challenge modal */
+.modal-overlay{position:absolute;inset:0;z-index:20;background:rgba(4,6,15,.65);backdrop-filter:blur(22px);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal-sheet{background:rgba(20,22,35,.95);border-top:1px solid rgba(255,255,255,.1);border-radius:28px 28px 0 0;padding:12px 20px 36px}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:3px}
+.modal-sub{font-size:12px;color:rgba(255,255,255,.38);margin-bottom:16px}
+.ch-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.09);border-radius:18px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.ch-card:active{transform:scale(.97)}
+.ch-card.speed{border-color:rgba(255,180,30,.3);background:rgba(255,150,20,.08)}
+.ch-card.hard{border-color:rgba(255,60,60,.3);background:rgba(220,40,40,.08)}
+.ch-card.perfect{border-color:rgba(120,80,255,.3);background:rgba(100,60,255,.08)}
+.ch-card-icon{font-size:28px;flex-shrink:0}
+.ch-card-body{flex:1;min-width:0}
+.ch-card-name{font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-card-desc{font-size:11px;color:rgba(255,255,255,.38);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-card-reward{font-size:11px;font-weight:700;color:#ffd060;margin-top:4px}
+.modal-normal-btn{width:100%;padding:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;font-size:14px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;margin-top:4px}
+
+/* Win */
+.win-ov{display:none;position:fixed;inset:0;z-index:80;justify-content:center;align-items:center;flex-direction:column;gap:18px;background:rgba(4,6,15,.75);backdrop-filter:blur(28px)}
+.win-ov.show{display:flex;animation:fIn .45s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.win-card{background:rgba(255,255,255,.05);backdrop-filter:blur(40px);border:1px solid rgba(255,255,255,.13);border-radius:30px;padding:32px 44px;text-align:center;max-width:310px;width:90%}
+.wc-planet{font-size:58px;display:block;margin-bottom:12px;animation:fl 2.5s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.wc-stars{display:flex;justify-content:center;gap:7px;margin-bottom:12px}
+.wst{font-size:32px;filter:grayscale(1) brightness(.4);transition:all .35s ease}
+.wst.on{filter:none;text-shadow:0 0 22px rgba(255,200,50,1)}
+.wc-title{font-size:24px;font-weight:800;background:linear-gradient(135deg,#fff 0%,#c0a0ff 50%,#60d0ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.wc-sub{font-size:13px;color:rgba(255,255,255,.4)}
+.win-rewards{display:flex;gap:8px;margin-top:14px;justify-content:center}
+.wr-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px}
+.wr-icon{font-size:20px}
+.wr-val{font-size:14px;font-weight:700;color:#fff}
+.wr-lbl{font-size:10px;color:rgba(255,255,255,.35)}
+.next-btn{background:linear-gradient(135deg,#7838ff 0%,#3878ff 100%);border:none;border-radius:20px;padding:14px 50px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 0 36px rgba(100,60,255,.4);transition:transform .2s}
+.next-btn:active{transform:scale(.95)}
+</style>
+</head>
+<body>
+<canvas id="starCanvas"></canvas>
+
+<div class="phone">
+
+  <!-- ══ TAB LAYER ══ -->
+  <div class="tab-layer">
+
+    <!-- ── TAB: PLANETS ── -->
+    <div class="tab active" id="tabPlanets">
+      <div class="space-bg-grad"></div>
+      <div class="map-nebula mn1"></div>
+      <div class="map-nebula mn2"></div>
+
+      <div class="map-header">
+        <div class="map-logo">✦ Stellar Words</div>
+        <div class="map-coins">🪙 <span id="mapCoins">120</span></div>
+      </div>
+
+      <div class="daily-banner" onclick="switchTab('tabDaily')">
+        <div class="daily-icon">🌠</div>
+        <div class="daily-text">
+          <div class="daily-title">Daily Challenge · Earth</div>
+          <div class="daily-sub">3× XP · Find 7 cosmic words</div>
+        </div>
+        <div class="daily-timer-pill" id="dailyTimer">--:--:--</div>
+      </div>
+
+      <div class="tab-scroll">
+        <div class="galaxy-path">
+
+          <div class="prow unlocked" onclick="openLevel(0)">
+            <div class="p-orb">
+              <div class="p-glow" style="background:rgba(210,120,45,1)"></div>
+              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#d49068,#7a3a18)">🪨</div>
+              <div class="p-stars"><span class="ps on">⭐</span><span class="ps on">⭐</span><span class="ps">⭐</span></div>
+            </div>
+            <div class="p-card">
+              <div class="p-card-name">Mercury</div>
+              <div class="p-card-desc">The scorched messenger. Words drift in the heat.</div>
+              <div class="p-challenges">
+                <div class="ch-pill done">⚡ Speed</div>
+                <div class="ch-pill active">🔥 Hard</div>
+                <div class="ch-pill">⭐ Perfect</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prow unlocked" onclick="openLevel(1)">
+            <div class="p-orb">
+              <div class="p-glow" style="background:rgba(220,170,45,1)"></div>
+              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#f0c058,#a05f1e)">🌕</div>
+              <div class="p-stars"><span class="ps on">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
+            </div>
+            <div class="p-card">
+              <div class="p-card-name">Venus</div>
+              <div class="p-card-desc">Golden clouds swirl. Love spelled in the atmosphere.</div>
+              <div class="p-challenges">
+                <div class="ch-pill done">⚡ Speed</div>
+                <div class="ch-pill">🔥 Hard</div>
+                <div class="ch-pill">⭐ Perfect</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prow unlocked" onclick="openLevel(2)">
+            <div class="p-orb">
+              <div class="p-glow" style="background:rgba(38,125,215,1)"></div>
+              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#50b0f0,#0e52a8)">🌍</div>
+              <div class="p-ring"></div>
+              <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
+            </div>
+            <div class="p-card">
+              <div class="p-card-name">Earth ✦ Now</div>
+              <div class="p-card-desc">Home base. Spell your world to unlock Mars.</div>
+              <div class="p-challenges">
+                <div class="ch-pill">⚡ Speed</div>
+                <div class="ch-pill">🔥 Hard</div>
+                <div class="ch-pill">⭐ Perfect</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prow locked">
+            <div class="p-orb">
+              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#c85848,#6a1610)">🔴</div>
+              <div class="lock-ic">🔒</div>
+              <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
+            </div>
+            <div class="p-card">
+              <div class="p-card-name">Mars</div>
+              <div class="p-card-desc">Red dust storms hide powerful words.</div>
+              <div class="p-card-tag">Complete Earth to unlock</div>
+            </div>
+          </div>
+
+          <div class="prow locked">
+            <div class="p-orb">
+              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#d08858,#784020)">🟠</div>
+              <div class="lock-ic">🔒</div>
+              <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
+            </div>
+            <div class="p-card">
+              <div class="p-card-name">Jupiter</div>
+              <div class="p-card-desc">7+ letter words spiral in the storm eye.</div>
+              <div class="p-card-tag">🔒 Locked</div>
+            </div>
+          </div>
+
+          <div class="prow locked">
+            <div class="p-orb">
+              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#e0c078,#887028)">🪐</div>
+              <div class="p-ring"></div>
+              <div class="lock-ic">🔒</div>
+              <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
+            </div>
+            <div class="p-card">
+              <div class="p-card-name">Saturn</div>
+              <div class="p-card-desc">Ringed riddles. Word chains loop the rings.</div>
+              <div class="p-card-tag">🔒 Locked</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: DAILY ── -->
+    <div class="tab hidden" id="tabDaily">
+      <div class="space-bg-grad"></div>
+
+      <div class="tab-header">
+        <div class="tab-title">Daily</div>
+        <div class="tab-coins">🪙 <span id="dailyCoins">120</span></div>
+      </div>
+
+      <div class="tab-scroll">
+
+        <!-- 1. STREAK HERO -->
+        <div class="streak-hero">
+          <div class="sh-top">
+            <div class="sh-flame">🔥</div>
+            <div class="sh-text">
+              <div class="sh-count">3</div>
+              <div class="sh-label">DAY STREAK</div>
+              <div class="sh-msg">Play today to reach <strong>Day 7</strong> and unlock a gem reward!</div>
+            </div>
+          </div>
+          <!-- Week progress dots -->
+          <div class="sh-week">
+            <div class="sh-dot done"></div>
+            <div class="sh-dot done"></div>
+            <div class="sh-dot today"></div>
+            <div class="sh-dot"></div>
+            <div class="sh-dot"></div>
+            <div class="sh-dot"></div>
+            <div class="sh-dot"></div>
+          </div>
+          <div class="sh-days">
+            <div class="sh-day-lbl done">Mon</div>
+            <div class="sh-day-lbl done">Tue</div>
+            <div class="sh-day-lbl today">Wed</div>
+            <div class="sh-day-lbl">Thu</div>
+            <div class="sh-day-lbl">Fri</div>
+            <div class="sh-day-lbl">Sat</div>
+            <div class="sh-day-lbl">Sun</div>
+          </div>
+        </div>
+
+        <!-- 2. DAILY CHALLENGE -->
+        <div class="dc-main" onclick="openLevel(2,'daily')">
+          <!-- Timer row -->
+          <div class="dc-timer-row">
+            <div class="dc-timer-badge">
+              <div class="dt-dot"></div>
+              Resets in <span id="dcTimer">--:--:--</span>
+            </div>
+            <div class="dc-badge-label">TODAY</div>
+          </div>
+          <!-- Planet + info -->
+          <div class="dc-body">
+            <div class="dc-planet-icon">🌍</div>
+            <div class="dc-body-text">
+              <div class="dc-title">Cosmic Wordsmith</div>
+              <div class="dc-sub">Earth · Find all 7 hidden words<br>to earn triple XP and a gem</div>
+            </div>
+          </div>
+          <!-- Reward chips -->
+          <div class="dc-chips">
+            <div class="dc-chip"><span class="dc-chip-icon">⚡</span> 3× XP</div>
+            <div class="dc-chip"><span class="dc-chip-icon">🪙</span> +200</div>
+            <div class="dc-chip"><span class="dc-chip-icon">💎</span> 1 Gem</div>
+          </div>
+          <!-- CTA -->
+          <button class="dc-cta">Start Today's Challenge →</button>
+        </div>
+
+        <!-- 3. 7-DAY REWARD TRACK -->
+        <div class="section-title">7-DAY REWARD TRACK</div>
+        <div class="reward-track">
+          <div class="rt-item done">
+            <div class="rt-check">✓</div>
+            <div class="rt-day">DAY 1</div>
+            <div class="rt-icon">🪙</div>
+            <div class="rt-val">+50</div>
+          </div>
+          <div class="rt-item done">
+            <div class="rt-check">✓</div>
+            <div class="rt-day">DAY 2</div>
+            <div class="rt-icon">⚡</div>
+            <div class="rt-val">+100 XP</div>
+          </div>
+          <div class="rt-item today">
+            <div class="rt-day">DAY 3</div>
+            <div class="rt-icon">🪙</div>
+            <div class="rt-val">+150</div>
+          </div>
+          <div class="rt-item locked">
+            <div class="rt-day">DAY 4</div>
+            <div class="rt-icon">⭐</div>
+            <div class="rt-val">Bonus</div>
+          </div>
+          <div class="rt-item locked">
+            <div class="rt-day">DAY 5</div>
+            <div class="rt-icon">🪙</div>
+            <div class="rt-val">+300</div>
+          </div>
+          <div class="rt-item locked">
+            <div class="rt-day">DAY 6</div>
+            <div class="rt-icon">🏆</div>
+            <div class="rt-val">Trophy</div>
+          </div>
+          <div class="rt-item locked">
+            <div class="rt-day">DAY 7</div>
+            <div class="rt-icon">💎</div>
+            <div class="rt-val">Gem!</div>
+          </div>
+        </div>
+
+        <!-- 4. WEEK ACTIVITY -->
+        <div class="section-title" style="margin-top:14px">THIS WEEK</div>
+        <div class="week-activity">
+          <div class="wa-row">
+            <div class="wa-label">Activity</div>
+            <div class="wa-total">3 days played</div>
+          </div>
+          <div class="wa-dots">
+            <div class="wa-dot played"><div class="wa-dot-circle">✦</div><div class="wa-dot-lbl">MON</div></div>
+            <div class="wa-dot played"><div class="wa-dot-circle">✦</div><div class="wa-dot-lbl">TUE</div></div>
+            <div class="wa-dot today"><div class="wa-dot-circle">▶</div><div class="wa-dot-lbl">WED</div></div>
+            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">THU</div></div>
+            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">FRI</div></div>
+            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">SAT</div></div>
+            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">SUN</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── TAB: QUESTS ── -->
+    <div class="tab hidden" id="tabQuests">
+      <div class="space-bg-grad"></div>
+      <div class="tab-header">
+        <div class="tab-title">Quests</div>
+        <div class="tab-coins">🪙 120</div>
+      </div>
+      <div class="tab-scroll">
+        <div class="quest-section">
+          <div class="qs-label">DAILY QUESTS · Resets in <span id="qTimer">18:42:05</span></div>
+          <div class="quest-card">
+            <div class="quest-icon">🪐</div>
+            <div class="quest-body">
+              <div class="quest-name">Planet Explorer</div>
+              <div class="quest-desc">Complete any 1 level today</div>
+              <div class="quest-progress"><div class="quest-bar" style="width:0%;background:linear-gradient(90deg,#7840ff,#40a0ff)"></div></div>
+            </div>
+            <div class="quest-reward">+50 🪙</div>
+          </div>
+          <div class="quest-card">
+            <div class="quest-icon">✨</div>
+            <div class="quest-body">
+              <div class="quest-name">Bonus Hunter</div>
+              <div class="quest-desc">Find 3 bonus words (not required)</div>
+              <div class="quest-progress"><div class="quest-bar" style="width:33%;background:linear-gradient(90deg,#ffb040,#ff7030)"></div></div>
+            </div>
+            <div class="quest-reward">+30 🪙</div>
+          </div>
+          <div class="quest-card">
+            <div class="quest-icon">⚡</div>
+            <div class="quest-body">
+              <div class="quest-name">Speed Demon</div>
+              <div class="quest-desc">Complete Speed Run challenge</div>
+              <div class="quest-progress"><div class="quest-bar" style="width:0%;background:linear-gradient(90deg,#ff8040,#ffd060)"></div></div>
+            </div>
+            <div class="quest-reward">+80 🪙</div>
+          </div>
+        </div>
+
+        <div class="quest-section" style="margin-top:8px">
+          <div class="qs-label">WEEKLY QUESTS · 4 days left</div>
+          <div class="quest-card">
+            <div class="quest-icon">🌟</div>
+            <div class="quest-body">
+              <div class="quest-name">Star Collector</div>
+              <div class="quest-desc">Earn 5 stars across all planets</div>
+              <div class="quest-progress"><div class="quest-bar" style="width:60%;background:linear-gradient(90deg,#ffd060,#ffb040)"></div></div>
+            </div>
+            <div class="quest-reward">💎 Gem</div>
+          </div>
+          <div class="quest-card">
+            <div class="quest-icon">🔥</div>
+            <div class="quest-body">
+              <div class="quest-name">Streak Master</div>
+              <div class="quest-desc">Maintain a 7-day streak</div>
+              <div class="quest-progress"><div class="quest-bar" style="width:43%;background:linear-gradient(90deg,#ff7030,#ff4020)"></div></div>
+            </div>
+            <div class="quest-reward">🏆 Trophy</div>
+          </div>
+          <div class="quest-card">
+            <div class="quest-icon">🌍</div>
+            <div class="quest-body">
+              <div class="quest-name">Perfectionist</div>
+              <div class="quest-desc">Get 3 stars on Earth</div>
+              <div class="quest-progress"><div class="quest-bar" style="width:0%;background:linear-gradient(90deg,#a080ff,#6060ff)"></div></div>
+            </div>
+            <div class="quest-done">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: PROFILE ── -->
+    <div class="tab hidden" id="tabProfile">
+      <div class="space-bg-grad"></div>
+      <div class="tab-scroll">
+        <div class="profile-hero">
+          <div class="profile-avatar">🧑‍🚀</div>
+          <div class="profile-name">Sandora</div>
+          <div class="profile-level">Level 4 · Stargazer</div>
+          <div class="xp-bar-wrap"><div class="xp-bar"></div></div>
+          <div class="xp-label">620 / 1000 XP to Level 5</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-val">247</div><div class="stat-lbl">Words Found</div></div>
+          <div class="stat-card"><div class="stat-icon">🪐</div><div class="stat-val">2</div><div class="stat-lbl">Planets Cleared</div></div>
+          <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val">3</div><div class="stat-lbl">Best Streak</div></div>
+          <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-val">5</div><div class="stat-lbl">Stars Earned</div></div>
+        </div>
+
+        <div class="section-title">ACHIEVEMENTS</div>
+        <div class="achievement-row">
+          <div class="ach-item"><div class="ach-icon">🚀</div><div class="ach-name">First Launch</div></div>
+          <div class="ach-item"><div class="ach-icon">🪨</div><div class="ach-name">Mercury Done</div></div>
+          <div class="ach-item"><div class="ach-icon">🔥</div><div class="ach-name">3-Day Streak</div></div>
+          <div class="ach-item locked"><div class="ach-icon">🌍</div><div class="ach-name">Earth Master</div></div>
+          <div class="ach-item locked"><div class="ach-icon">💎</div><div class="ach-name">Gem Hunter</div></div>
+          <div class="ach-item locked"><div class="ach-icon">🏆</div><div class="ach-name">Champion</div></div>
+        </div>
+
+        <div class="section-title" style="margin-top:8px">SETTINGS</div>
+        <div class="settings-row">
+          <div class="setting-item"><div class="setting-icon">🔔</div><div class="setting-label">Notifications</div><div class="setting-arrow">›</div></div>
+          <div class="setting-item"><div class="setting-icon">🔊</div><div class="setting-label">Sound & Haptics</div><div class="setting-arrow">›</div></div>
+          <div class="setting-item"><div class="setting-icon">🌙</div><div class="setting-label">Appearance</div><div class="setting-arrow">›</div></div>
+          <div class="setting-item"><div class="setting-icon">❓</div><div class="setting-label">Help & Support</div><div class="setting-arrow">›</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-layer -->
+
+  <!-- ══ BOTTOM NAV BAR — iOS Native ══ -->
+  <div class="nav-bar">
+    <div class="nav-item active" id="nav-planets" onclick="switchTab('tabPlanets')">
+      <div class="nav-icon"><span class="nav-icon-img">🪐</span></div>
+      <div class="nav-label">Planets</div>
+    </div>
+    <div class="nav-item" id="nav-daily" onclick="switchTab('tabDaily')">
+      <div class="nav-icon"><span class="nav-icon-img">🌠</span></div>
+      <div class="nav-label">Daily</div>
+    </div>
+    <div class="nav-item" id="nav-quests" onclick="switchTab('tabQuests')">
+      <div class="nav-icon"><span class="nav-icon-img">📜</span></div>
+      <div class="nav-label">Quests</div>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="switchTab('tabProfile')">
+      <div class="nav-icon"><span class="nav-icon-img">👤</span></div>
+      <div class="nav-label">Profile</div>
+    </div>
+  </div>
+
+  <!-- ══ GAME OVERLAY (full screen) ══ -->
+  <div class="overlay off-r" id="gameScreen">
+    <div class="game-bg" id="gameBg">
+      <div class="game-planet-far"     id="gamePlanetFar"></div>
+      <div class="game-planet-far-glow" id="gamePlanetFarGlow"></div>
+      <div class="game-planet-tint-top" id="gamePlanetTintTop"></div>
+      <div class="planet-corona"  id="planetCorona"></div>
+      <div class="planet-sphere"  id="planetSphere"></div>
+      <div class="planet-ambient" id="planetAmbient"></div>
+    </div>
+
+    <div class="game-nav">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="gn-info">
+        <div class="gn-planet" id="gnPlanet">🌍 Earth</div>
+        <div class="gn-sub"   id="gnSub">Find all 5 words</div>
+      </div>
+      <div class="gn-coins">🪙 <span id="gameCoins">120</span></div>
+    </div>
+
+    <div class="challenge-bar" id="challengeBar" style="display:none">
+      <span id="chModeIcon">⚡</span>
+      <span class="ch-label" id="chModeLabel">SPEED RUN</span>
+      <span class="ch-timer" id="chTimerDisplay">01:00</span>
+    </div>
+
+    <div class="constellation" id="constellation">
+      <div class="cw-canvas" id="cwCanvas"></div>
+    </div>
+    <div class="gdiv"></div>
+    <div class="cur-word-area">
+      <div class="cur-letters" id="curLetters"></div>
+    </div>
+    <div class="orb-wrap">
+      <div class="orb" id="orb">
+        <div class="orb-ring" id="orbRing"></div>
+        <div class="orb-dome"></div>
+        <div class="orb-iglow"></div>
+        <svg class="orb-svg" id="orbSvg" viewBox="0 0 232 232" overflow="visible"></svg>
+      </div>
+    </div>
+    <div class="game-actions">
+      <div class="act-btn" onclick="doShuffle()"><span class="act-icon">🔀</span><span class="act-lbl">SHUFFLE</span></div>
+      <div class="act-btn" onclick="doHint()">   <span class="act-icon">💡</span><span class="act-lbl">HINT</span></div>
+      <div class="act-btn" onclick="doScan()">   <span class="act-icon">🔭</span><span class="act-lbl">SCAN</span></div>
+    </div>
+
+    <!-- Challenge modal -->
+    <div class="modal-overlay" id="challengeModal">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title" id="modalTitle">🌍 Earth — Choose Mode</div>
+        <div class="modal-sub">Complete challenges to earn bonus XP</div>
+        <div class="ch-card speed" onclick="startChallenge('speed')">
+          <div class="ch-card-icon">⚡</div>
+          <div class="ch-card-body">
+            <div class="ch-card-name">Speed Run</div>
+            <div class="ch-card-desc">Find all words in 60 seconds</div>
+            <div class="ch-card-reward">+150 XP · 🪙 ×2</div>
+          </div>
+        </div>
+        <div class="ch-card hard" onclick="startChallenge('hard')">
+          <div class="ch-card-icon">🔥</div>
+          <div class="ch-card-body">
+            <div class="ch-card-name">Hard Mode</div>
+            <div class="ch-card-desc">No hints, no shuffle — pure skill</div>
+            <div class="ch-card-reward">+200 XP · 🏆 Trophy</div>
+          </div>
+        </div>
+        <div class="ch-card perfect" onclick="startChallenge('perfect')">
+          <div class="ch-card-icon">⭐</div>
+          <div class="ch-card-body">
+            <div class="ch-card-name">Perfectionist</div>
+            <div class="ch-card-desc">Find every possible word</div>
+            <div class="ch-card-reward">+300 XP · 💎 Gem</div>
+          </div>
+        </div>
+        <button class="modal-normal-btn" onclick="startNormal()">Play Normal Mode</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<!-- WIN -->
+<div class="win-ov" id="winOv">
+  <div class="win-card">
+    <span class="wc-planet" id="wcPlanet">🌍</span>
+    <div class="wc-stars"><span class="wst" id="ws0">⭐</span><span class="wst" id="ws1">⭐</span><span class="wst" id="ws2">⭐</span></div>
+    <div class="wc-title" id="wcTitle">Earth Cleared!</div>
+    <div class="wc-sub" id="wcSub">All words discovered</div>
+    <div class="win-rewards">
+      <div class="wr-item"><div class="wr-icon">⚡</div><div class="wr-val" id="wrXp">+75</div><div class="wr-lbl">XP</div></div>
+      <div class="wr-item"><div class="wr-icon">🪙</div><div class="wr-val" id="wrCoins">+50</div><div class="wr-lbl">Coins</div></div>
+      <div class="wr-item"><div class="wr-icon">⭐</div><div class="wr-val" id="wrStars">2/3</div><div class="wr-lbl">Stars</div></div>
+    </div>
+  </div>
+  <button class="next-btn" onclick="nextLevel()">NEXT PLANET →</button>
+</div>
+
+<script>
+/* ── STARS ── */
+const cvs=document.getElementById('starCanvas'),c2=cvs.getContext('2d');
+let ST=[],starTint=[255,255,255];
+function rCvs(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;ST=Array.from({length:220},()=>({x:Math.random()*cvs.width,y:Math.random()*cvs.height,r:Math.random()*1.4+.2,tw:Math.random()*Math.PI*2,sp:Math.random()*.007+.003}));}
+function drawST(){c2.clearRect(0,0,cvs.width,cvs.height);const t=Date.now()*.001,[sr,sg,sb]=starTint;ST.forEach(s=>{const a=.2+.6*Math.sin(t*s.sp*55+s.tw);c2.beginPath();c2.arc(s.x,s.y,s.r,0,Math.PI*2);c2.fillStyle=`rgba(${sr},${sg},${sb},${a})`;c2.fill();if(s.r>1.1&&Math.sin(t*.22+s.tw)>.75){c2.strokeStyle=`rgba(${sr},${sg},${sb},${a*.4})`;c2.lineWidth=.35;c2.beginPath();c2.moveTo(s.x-5,s.y);c2.lineTo(s.x+5,s.y);c2.stroke();c2.beginPath();c2.moveTo(s.x,s.y-5);c2.lineTo(s.x,s.y+5);c2.stroke();}});requestAnimationFrame(drawST);}
+window.addEventListener('resize',rCvs);rCvs();drawST();
+
+/* ── TIMER ── */
+function getCountdown(){const now=new Date(),midnight=new Date();midnight.setHours(24,0,0,0);const d=midnight-now,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+function updateTimers(){const t=getCountdown();['dailyTimer','dcTimer','qTimer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});}
+updateTimers();setInterval(updateTimers,1000);
+
+/* ── TAB NAVIGATION ── */
+const tabMap={'tabPlanets':'nav-planets','tabDaily':'nav-daily','tabQuests':'nav-quests','tabProfile':'nav-profile'};
+function switchTab(tabId){
+  document.querySelectorAll('.tab').forEach(t=>t.className='tab hidden');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(tabId).className='tab active';
+  const navId=tabMap[tabId];
+  if(navId)document.getElementById(navId).classList.add('active');
+}
+
+/* ── LEVELS ── */
+const SLOT=44,GAP=5,STEP=SLOT+GAP;
+const LEVELS=[
+  {planet:'🪨',name:'Mercury',theme:'mercury',
+   bgImage:'https://d8j0ntlcm91z4.cloudfront.net/user_3EPEtaIiNqOfWU9GROOpSEr7he5/hf_20260529_163313_facffc51-9f1d-460d-9c48-5b273eea729b_min.webp',
+   starTint:[255,190,120],
+   sphere:{bg:'radial-gradient(circle at 42% 38%,#e09868,#8a4020,#4a1a08)',glow:'rgba(200,100,30,.5)'},
+   farBg:'radial-gradient(circle at 42% 38%,#e09868,#8a4020,#4a1a08)',farGlow:'rgba(200,100,30,1)',
+   tintTop:'radial-gradient(ellipse at 80% 0%,rgba(200,100,30,.12) 0%,transparent 55%)',
+   ambient:'linear-gradient(to top,rgba(200,100,30,.22) 0%,rgba(140,55,10,.08) 40%,transparent 75%)',
+   orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(220,120,40,.65) 30%,transparent 60%,rgba(180,80,20,.35) 90%,transparent 100%)',
+   letters:['C','A','T','S','R'],words:['CAT','CATS','CAR','CARS','STAR','RATS','ARC','SCAR','ARTS','CART'],required:['STAR','SCAR','CARS','CART','CATS'],
+   placements:[{word:'STAR',dir:'H',row:0,col:0},{word:'SCAR',dir:'V',row:0,col:0},{word:'CARS',dir:'H',row:1,col:0},{word:'CART',dir:'H',row:3,col:1},{word:'CATS',dir:'H',row:4,col:1}]},
+  {planet:'🌕',name:'Venus',theme:'venus',
+   bgImage:'https://d8j0ntlcm91z4.cloudfront.net/user_3EPEtaIiNqOfWU9GROOpSEr7he5/hf_20260529_163334_fafaa86e-66c1-44f8-9ec7-248fd2c7f2bd_min.webp',
+   starTint:[255,230,120],
+   sphere:{bg:'radial-gradient(circle at 42% 38%,#f0d070,#c08020,#704010)',glow:'rgba(210,160,30,.5)'},
+   farBg:'radial-gradient(circle at 42% 38%,#f0d070,#c08020,#704010)',farGlow:'rgba(210,160,30,1)',
+   tintTop:'radial-gradient(ellipse at 80% 0%,rgba(210,160,30,.1) 0%,transparent 55%)',
+   ambient:'linear-gradient(to top,rgba(210,160,30,.2) 0%,rgba(160,110,10,.08) 40%,transparent 75%)',
+   orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(230,180,40,.65) 30%,transparent 60%,rgba(180,130,10,.35) 90%,transparent 100%)',
+   letters:['O','L','V','E','S'],words:['LOVE','SOLE','VOLE','LOSE','LOVES','SOLVE','SLOE','VOLES'],required:['LOVES','LOSE','SOLE','SOLVE','LOVE'],
+   placements:[{word:'LOVES',dir:'H',row:0,col:0},{word:'LOSE',dir:'V',row:0,col:0},{word:'SOLE',dir:'H',row:2,col:0},{word:'SOLVE',dir:'V',row:0,col:4},{word:'LOVE',dir:'H',row:4,col:0}]},
+  {planet:'🌍',name:'Earth',theme:'earth',
+   bgImage:'https://d8j0ntlcm91z4.cloudfront.net/user_3EPEtaIiNqOfWU9GROOpSEr7he5/hf_20260529_163358_2bc5a893-5946-4354-9082-5464428dd5a6_min.webp',
+   starTint:[130,210,255],
+   sphere:{bg:'radial-gradient(circle at 42% 38%,#58b8f8,#1458b0,#081840)',glow:'rgba(30,110,220,.5)'},
+   farBg:'radial-gradient(circle at 42% 38%,#58b8f8,#1458b0,#081840)',farGlow:'rgba(30,110,220,1)',
+   tintTop:'radial-gradient(ellipse at 80% 0%,rgba(30,110,220,.12) 0%,transparent 55%)',
+   ambient:'linear-gradient(to top,rgba(20,100,220,.22) 0%,rgba(10,60,160,.08) 40%,transparent 75%)',
+   orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(50,140,255,.65) 30%,transparent 60%,rgba(20,80,200,.35) 90%,transparent 100%)',
+   letters:['S','P','I','N','E'],words:['SPIN','SNIPE','PINE','PIN','SIN','SINE','PEN','SPINE','PINES','PEIN'],required:['SNIPE','SPIN','PINE','SIN','PIN'],
+   placements:[{word:'SNIPE',dir:'H',row:0,col:0},{word:'SPIN',dir:'H',row:2,col:0},{word:'SIN',dir:'V',row:2,col:0},{word:'PIN',dir:'V',row:2,col:1},{word:'PINE',dir:'V',row:1,col:2}]}
+];
+
+let lvlIdx=2,lvl=LEVELS[2],found=new Set(),sel=[],dragging=false,lpos=[];
+let challengeMode=null,timerInterval=null,timeLeft=60;
+
+/* ── GAME NAVIGATION ── */
+function openLevel(i,mode){
+  if(i>2)return;
+  lvlIdx=i;lvl=LEVELS[i];found=new Set();sel=[];challengeMode=null;stopTimer();
+  applyTheme();
+  document.getElementById('gnPlanet').textContent=lvl.planet+' '+lvl.name;
+  document.getElementById('gnSub').textContent=`Find all ${lvl.required.length} words`;
+  document.getElementById('wcPlanet').textContent=lvl.planet;
+  document.getElementById('wcTitle').textContent=lvl.name+' Cleared!';
+  document.getElementById('challengeBar').style.display='none';
+  buildCrossword();buildOrb();resetSel();
+
+  if(mode==='daily'){challengeMode='daily';document.getElementById('gnSub').textContent='Daily Challenge · 7 words';}
+  else{document.getElementById('challengeModal').classList.add('show');document.getElementById('modalTitle').textContent=lvl.planet+' '+lvl.name+' — Choose Mode';}
+  document.getElementById('gameScreen').className='overlay on';
+  document.querySelector('.nav-bar').classList.add('nav-hidden');
+}
+
+function goBack(){
+  stopTimer();
+  document.getElementById('challengeBar').style.display='none';
+  document.getElementById('challengeModal').classList.remove('show');
+  document.getElementById('gameScreen').className='overlay off-r';
+  document.querySelector('.nav-bar').classList.remove('nav-hidden');
+  starTint=[255,255,255];
+}
+
+function startChallenge(mode){
+  challengeMode=mode;
+  document.getElementById('challengeModal').classList.remove('show');
+  const bar=document.getElementById('challengeBar');
+  const icons={speed:'⚡',hard:'🔥',perfect:'⭐'};
+  const labels={speed:'SPEED RUN',hard:'HARD MODE',perfect:'PERFECTIONIST'};
+  bar.className='challenge-bar '+mode;bar.style.display='flex';
+  document.getElementById('chModeIcon').textContent=icons[mode];
+  document.getElementById('chModeLabel').textContent=labels[mode];
+  document.getElementById('gnSub').textContent=mode==='speed'?'60 seconds!':mode==='hard'?'No hints allowed':'Find every word!';
+  if(mode==='speed'){timeLeft=60;startTimer();}
+}
+
+function startNormal(){document.getElementById('challengeModal').classList.remove('show');document.getElementById('challengeBar').style.display='none';document.getElementById('gnSub').textContent=`Find all ${lvl.required.length} words`;}
+
+function startTimer(){
+  timerInterval=setInterval(()=>{
+    timeLeft--;const m=Math.floor(timeLeft/60),s=timeLeft%60;
+    const el=document.getElementById('chTimerDisplay');
+    el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(timeLeft<=10)el.classList.add('urgent');
+    if(timeLeft<=0){clearInterval(timerInterval);showWin();}
+  },1000);
+}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+
+/* ── THEME ── */
+function applyTheme(){
+  const t=lvl,W=500;
+  const bg=document.getElementById('gameBg');
+  bg.style.backgroundImage=t.bgImage?`url(${t.bgImage})`:'none';
+  document.getElementById('gamePlanetFar').style.background=t.farBg;
+  document.getElementById('gamePlanetFarGlow').style.background=t.farGlow;
+  document.getElementById('gamePlanetTintTop').style.background=t.tintTop;
+  const sph=document.getElementById('planetSphere');
+  sph.style.width=W+'px';sph.style.height=W+'px';sph.style.background=t.sphere.bg;sph.style.boxShadow=`0 0 100px ${t.sphere.glow},0 0 200px ${t.sphere.glow.replace('.5','0.18')},inset 0 -40px 80px rgba(0,0,0,.55),inset 25px -25px 50px rgba(0,0,0,.35)`;
+  const cor=document.getElementById('planetCorona');cor.style.width=(W+160)+'px';cor.style.height=(W+160)+'px';cor.style.background=t.sphere.glow;
+  document.getElementById('planetAmbient').style.background=t.ambient;
+  document.getElementById('orbRing').style.background=t.orbRing;
+  starTint=t.starTint;
+}
+
+/* ── CROSSWORD ── */
+function buildCrossword(){
+  const canvas=document.getElementById('cwCanvas');canvas.innerHTML='';
+  let minR=99,maxR=0,minC=99,maxC=0;
+  lvl.placements.forEach(p=>{const l=p.word.length,r2=p.dir==='H'?p.row:p.row+l-1,c2=p.dir==='H'?p.col+l-1:p.col;minR=Math.min(minR,p.row);maxR=Math.max(maxR,r2);minC=Math.min(minC,p.col);maxC=Math.max(maxC,c2);});
+  const cols=maxC-minC+1,rows=maxR-minR+1;
+  canvas.style.width=(cols*SLOT+(cols-1)*GAP)+'px';canvas.style.height=(rows*SLOT+(rows-1)*GAP)+'px';
+  const cellMap={};
+  lvl.placements.forEach(p=>{for(let i=0;i<p.word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,k=`${r},${c}`;if(!cellMap[k])cellMap[k]={letter:p.word[i]};}});
+  Object.entries(cellMap).forEach(([k,d])=>{const[r,c]=k.split(',').map(Number),slot=document.createElement('div');slot.className='cw-slot';slot.id=`sl-${r}-${c}`;slot.style.left=((c-minC)*STEP)+'px';slot.style.top=((r-minR)*STEP)+'px';canvas.appendChild(slot);});
+}
+function revealWord(word){
+  let minR=99,minC=99;lvl.placements.forEach(p=>{minR=Math.min(minR,p.row);minC=Math.min(minC,p.col);});
+  const p=lvl.placements.find(x=>x.word===word);if(!p)return;
+  word.split('').forEach((letter,i)=>{const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,slot=document.getElementById(`sl-${r}-${c}`);if(slot)setTimeout(()=>{slot.classList.add('revealed','t-'+lvl.theme);slot.textContent=letter;},i*80);});
+}
+
+/* ── ORB ── */
+function buildOrb(){
+  document.getElementById('orb').querySelectorAll('.lnode').forEach(n=>n.remove());lpos=[];
+  const cx=116,cy=116,r=80;
+  lvl.letters.forEach((letter,i)=>{const a=(i/lvl.letters.length)*Math.PI*2-Math.PI/2,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);lpos.push({x,y,letter,index:i});const node=document.createElement('div');node.className='lnode';node.id=`ln-${i}`;node.textContent=letter;node.style.left=x+'px';node.style.top=y+'px';document.getElementById('orb').appendChild(node);});
+}
+function getNodeAt(cx,cy){const rect=document.getElementById('orb').getBoundingClientRect(),px=cx-rect.left,py=cy-rect.top;return lpos.find(p=>{const dx=px-p.x,dy=py-p.y;return dx*dx+dy*dy<32*32;})||null;}
+function updateSvg(curX,curY){
+  const svg=document.getElementById('orbSvg');svg.innerHTML='';
+  const cols={mercury:'rgba(220,140,60,.85)',venus:'rgba(230,200,60,.85)',earth:'rgba(80,160,255,.85)',mars:'rgba(230,80,40,.85)'};
+  const col=cols[lvl.theme]||'rgba(200,170,255,.85)';
+  const pts=sel.map(s=>lpos[s.index]);
+  for(let i=0;i<pts.length-1;i++){const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',pts[i].x);l.setAttribute('y1',pts[i].y);l.setAttribute('x2',pts[i+1].x);l.setAttribute('y2',pts[i+1].y);l.setAttribute('class','ln-solid');l.setAttribute('stroke',col);svg.appendChild(l);}
+  if(dragging&&pts.length>0&&curX!==undefined){const rect=document.getElementById('orb').getBoundingClientRect(),last=pts[pts.length-1],l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',last.x);l.setAttribute('y1',last.y);l.setAttribute('x2',curX-rect.left);l.setAttribute('y2',curY-rect.top);l.setAttribute('class','ln-dash');l.setAttribute('stroke',col.replace('.85','.35'));svg.appendChild(l);}
+}
+function updateNodes(){const idxs=new Set(sel.map(s=>s.index));lpos.forEach((_,i)=>{const n=document.getElementById(`ln-${i}`);n.classList.remove('sel','t-mercury','t-venus','t-earth','t-mars');if(idxs.has(i))n.classList.add('sel','t-'+lvl.theme);});document.getElementById('orb').classList.toggle('active',idxs.size>0);}
+function updateCurLetters(){const wrap=document.getElementById('curLetters');wrap.innerHTML='';sel.forEach(s=>{const el=document.createElement('div');el.className='cur-l t-'+lvl.theme;el.textContent=s.letter;wrap.appendChild(el);});}
+function onStart(e){e.preventDefault();dragging=true;sel=[];const pt=e.touches?e.touches[0]:e,pos=getNodeAt(pt.clientX,pt.clientY);if(pos){sel.push(pos);updateNodes();updateCurLetters();}updateSvg(pt.clientX,pt.clientY);}
+function onMove(e){e.preventDefault();if(!dragging)return;const pt=e.touches?e.touches[0]:e,pos=getNodeAt(pt.clientX,pt.clientY);if(pos){const ai=sel.findIndex(s=>s.index===pos.index);if(ai===-1){sel.push(pos);updateNodes();updateCurLetters();}else if(ai===sel.length-2){sel.pop();updateNodes();updateCurLetters();}}updateSvg(pt.clientX,pt.clientY);}
+function onEnd(e){e.preventDefault();dragging=false;updateSvg();trySubmit();}
+const orbEl=document.getElementById('orb');
+orbEl.addEventListener('touchstart',onStart,{passive:false});orbEl.addEventListener('touchmove',onMove,{passive:false});orbEl.addEventListener('touchend',onEnd,{passive:false});
+orbEl.addEventListener('mousedown',onStart);document.addEventListener('mousemove',e=>{if(dragging)onMove(e);});document.addEventListener('mouseup',e=>{if(dragging)onEnd(e);});
+
+/* ── SUBMIT ── */
+function trySubmit(){
+  const word=sel.map(s=>s.letter).join('');if(word.length<2){resetSel();return;}
+  const isReq=lvl.required.includes(word),isBonus=lvl.words.includes(word)&&!isReq;
+  if((isReq||isBonus)&&!found.has(word)){
+    found.add(word);const mult=challengeMode==='daily'?3:challengeMode==='speed'?2:1;
+    const earned=word.length*(isBonus?8:5)*mult;
+    ['gameCoins','mapCoins','dailyCoins'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=+el.textContent+earned;});
+    if(isReq)revealWord(word);else showBonus(word);
+    resetSel();
+    if(lvl.required.every(w=>found.has(w))){stopTimer();setTimeout(showWin,750);}
+  } else {
+    if(challengeMode==='hard'&&word.length<2){resetSel();return;}
+    document.getElementById('curLetters').classList.add('shake');
+    setTimeout(()=>{document.getElementById('curLetters').classList.remove('shake');resetSel();},420);
+  }
+}
+function resetSel(){sel=[];dragging=false;updateCurLetters();updateNodes();updateSvg();}
+function showBonus(word){const c=document.getElementById('constellation'),t=document.createElement('div');t.className='bonus-toast';t.textContent='+ '+word;c.appendChild(t);setTimeout(()=>t.remove(),2400);}
+
+/* ── WIN ── */
+function showWin(){
+  const bonus=[...found].filter(w=>!lvl.required.includes(w)).length;
+  const stars=bonus>=3?3:bonus>=1?2:1;const mult=challengeMode==='daily'?3:challengeMode==='speed'?2:challengeMode==='perfect'?4:1;
+  document.getElementById('wrXp').textContent='+'+(stars*25+lvl.required.length*10)*mult;
+  document.getElementById('wrCoins').textContent='+'+(stars*15+5*lvl.required.length)*mult;
+  document.getElementById('wrStars').textContent=stars+'/3';
+  [0,1,2].forEach(i=>{document.getElementById('ws'+i).classList.remove('on');if(i<stars)setTimeout(()=>document.getElementById('ws'+i).classList.add('on'),i*220+350);});
+  document.getElementById('wcSub').textContent=challengeMode?challengeMode+' mode · '+mult+'× bonus!':'All words discovered';
+  setTimeout(()=>document.getElementById('winOv').classList.add('show'),100);
+}
+function nextLevel(){document.getElementById('winOv').classList.remove('show');goBack();}
+
+/* ── ACTIONS ── */
+function doShuffle(){if(challengeMode==='hard')return;const a=lvl.letters;for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}buildOrb();resetSel();}
+function doHint(){if(challengeMode==='hard')return;const coins=+document.getElementById('gameCoins').textContent;if(coins<10)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[0];document.getElementById('gameCoins').textContent=coins-10;resetSel();for(const letter of word){const pos=lpos.find(p=>p.letter===letter&&!sel.some(s=>s.index===p.index));if(pos)sel.push(pos);}updateNodes();updateCurLetters();updateSvg();setTimeout(trySubmit,900);}
+function doScan(){const coins=+document.getElementById('gameCoins').textContent;if(coins<15)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[Math.floor(Math.random()*rem.length)],p=lvl.placements.find(x=>x.word===word);const hidden=[];for(let i=0;i<word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,slot=document.getElementById(`sl-${r}-${c}`);if(slot&&!slot.classList.contains('revealed'))hidden.push({r,c,letter:word[i]});}if(!hidden.length)return;document.getElementById('gameCoins').textContent=coins-15;const cell=hidden[Math.floor(Math.random()*hidden.length)],slot=document.getElementById(`sl-${cell.r}-${cell.c}`);slot.classList.add('revealed','t-'+lvl.theme);slot.textContent=cell.letter;}
+
+buildCrossword();buildOrb();
+</script>
+</body>
+</html>
