@@ -25,7 +25,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   /* Чистий glass — нуль заливки, тільки blur */
   background:rgba(255,255,255,0.05);
   backdrop-filter:blur(32px) saturate(1.9) brightness(1.06);
-  -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.06);
+  -webkit-backdrop-filter:blur(4px) saturate(1.9) brightness(1.06);
 
   border-radius:36px;
   border:1px solid rgba(255,255,255,0.13);
@@ -296,6 +296,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   color:#ff8060;background:rgba(255,80,40,.1);
   border:1px solid rgba(255,80,40,.22);
   border-radius:12px;padding:5px 10px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .dc-timer-badge .dt-dot{
   width:6px;height:6px;border-radius:50%;
@@ -534,8 +535,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .gn-coins{display:flex;align-items:center;gap:6px;background:rgba(255,190,30,.1);backdrop-filter:blur(14px);border:1px solid rgba(255,190,30,.2);border-radius:18px;padding:6px 11px;font-size:13px;font-weight:700;color:#ffd060}
 
 /* Crossword */
-.constellation{position:relative;z-index:3;flex:1;display:flex;justify-content:center;align-items:center;padding:6px 16px 0;overflow:hidden;min-height:0}
-.cw-canvas{position:relative}
+.constellation{position:relative;z-index:3;flex:1;display:flex;justify-content:center;align-items:center;padding:6px 16px 0;overflow:hidden;min-height:0;transition:padding .2s ease}
+.constellation.has-timer{padding:2px 16px 0}
+.cw-canvas{position:relative;transform-origin:center;transition:transform .2s ease}
 .cw-slot{position:absolute;width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:rgba(255,255,255,.04);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:transparent;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
 .cw-slot.revealed{color:#fff;animation:slotIn .42s cubic-bezier(.34,1.56,.64,1) both}
 .cw-slot.revealed.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.25),rgba(160,70,15,.12));border-color:rgba(230,150,70,.42);text-shadow:0 0 14px rgba(255,160,60,.95),0 0 30px rgba(220,100,20,.5);box-shadow:0 0 18px rgba(210,110,30,.22),inset 0 1px 0 rgba(255,200,120,.18)}
@@ -585,15 +587,17 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .act-btn{flex:1;max-width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);border-radius:17px;padding:9px 6px;cursor:pointer;transition:transform .2s}
 .act-btn:active{transform:scale(.91)}
 .act-icon{font-size:21px}
-.act-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.5px}
+.act-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Challenge modal */
-.modal-overlay{position:absolute;inset:0;z-index:20;background:rgba(4,6,15,.65);backdrop-filter:blur(22px);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.modal-overlay{position:absolute;inset:0;z-index:20;background:rgba(4,6,15,.5);backdrop-filter:blur(2px);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .modal-overlay.show{opacity:1;pointer-events:all}
-.modal-sheet{background:rgba(20,22,35,.95);border-top:1px solid rgba(255,255,255,.1);border-radius:28px 28px 0 0;padding:12px 20px 36px}
+.modal-sheet{background:rgba(20,22,35,.95);border-top:1px solid rgba(255,255,255,.1);border-radius:28px 28px 0 0;padding:12px 20px 36px;position:relative}
 .modal-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 18px}
-.modal-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:3px}
-.modal-sub{font-size:12px;color:rgba(255,255,255,.38);margin-bottom:16px}
+.modal-close{position:absolute;top:14px;right:18px;width:28px;height:28px;border:none;background:rgba(255,255,255,.08);border-radius:50%;color:rgba(255,255,255,.6);font-size:16px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;border:1px solid rgba(255,255,255,.1)}
+.modal-close:active{transform:scale(.9);background:rgba(255,255,255,.12)}
+.modal-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-sub{font-size:12px;color:rgba(255,255,255,.38);margin-bottom:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ch-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.09);border-radius:18px;margin-bottom:10px;cursor:pointer;transition:all .2s}
 .ch-card:active{transform:scale(.97)}
 .ch-card.speed{border-color:rgba(255,180,30,.3);background:rgba(255,150,20,.08)}
@@ -603,7 +607,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .ch-card-body{flex:1;min-width:0}
 .ch-card-name{font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ch-card-desc{font-size:11px;color:rgba(255,255,255,.38);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ch-card-reward{font-size:11px;font-weight:700;color:#ffd060;margin-top:4px}
+.ch-card-reward{font-size:11px;font-weight:700;color:#ffd060;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modal-normal-btn{width:100%;padding:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;font-size:14px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;margin-top:4px}
 
 /* Win */
@@ -1066,39 +1070,40 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
       <div class="act-btn" onclick="doHint()">   <span class="act-icon">💡</span><span class="act-lbl">HINT</span></div>
       <div class="act-btn" onclick="doScan()">   <span class="act-icon">🔭</span><span class="act-lbl">SCAN</span></div>
     </div>
+  </div>
 
-    <!-- Challenge modal -->
-    <div class="modal-overlay" id="challengeModal">
-      <div class="modal-sheet">
-        <div class="modal-handle"></div>
-        <div class="modal-title" id="modalTitle">🌍 Earth — Choose Mode</div>
-        <div class="modal-sub">Complete challenges to earn bonus XP</div>
-        <div class="ch-card speed" onclick="startChallenge('speed')">
-          <div class="ch-card-icon">⚡</div>
-          <div class="ch-card-body">
-            <div class="ch-card-name">Speed Run</div>
-            <div class="ch-card-desc">Find all words in 60 seconds</div>
-            <div class="ch-card-reward">+150 XP · 🪙 ×2</div>
-          </div>
+  <!-- Challenge modal -->
+  <div class="modal-overlay" id="challengeModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="goBack()">✕</button>
+      <div class="modal-title" id="modalTitle">🌍 Earth — Choose Mode</div>
+      <div class="modal-sub">Complete challenges to earn bonus XP</div>
+      <div class="ch-card speed" onclick="startChallenge('speed')">
+        <div class="ch-card-icon">⚡</div>
+        <div class="ch-card-body">
+          <div class="ch-card-name">Speed Run</div>
+          <div class="ch-card-desc">Find all words in 60 seconds</div>
+          <div class="ch-card-reward">+150 XP · 🪙 ×2</div>
         </div>
-        <div class="ch-card hard" onclick="startChallenge('hard')">
-          <div class="ch-card-icon">🔥</div>
-          <div class="ch-card-body">
-            <div class="ch-card-name">Hard Mode</div>
-            <div class="ch-card-desc">No hints, no shuffle — pure skill</div>
-            <div class="ch-card-reward">+200 XP · 🏆 Trophy</div>
-          </div>
-        </div>
-        <div class="ch-card perfect" onclick="startChallenge('perfect')">
-          <div class="ch-card-icon">⭐</div>
-          <div class="ch-card-body">
-            <div class="ch-card-name">Perfectionist</div>
-            <div class="ch-card-desc">Find every possible word</div>
-            <div class="ch-card-reward">+300 XP · 💎 Gem</div>
-          </div>
-        </div>
-        <button class="modal-normal-btn" onclick="startNormal()">Play Normal Mode</button>
       </div>
+      <div class="ch-card hard" onclick="startChallenge('hard')">
+        <div class="ch-card-icon">🔥</div>
+        <div class="ch-card-body">
+          <div class="ch-card-name">Hard Mode</div>
+          <div class="ch-card-desc">No hints, no shuffle — pure skill</div>
+          <div class="ch-card-reward">+200 XP · 🏆 Trophy</div>
+        </div>
+      </div>
+      <div class="ch-card perfect" onclick="startChallenge('perfect')">
+        <div class="ch-card-icon">⭐</div>
+        <div class="ch-card-body">
+          <div class="ch-card-name">Perfectionist</div>
+          <div class="ch-card-desc">Find every possible word</div>
+          <div class="ch-card-reward">+300 XP · 💎 Gem</div>
+        </div>
+      </div>
+      <button class="modal-normal-btn" onclick="startNormal()">Play Normal Mode</button>
     </div>
   </div>
 
@@ -1195,7 +1200,7 @@ function openLevel(i,mode){
 
   if(mode==='daily'){challengeMode='daily';document.getElementById('gnSub').textContent='Daily Challenge · 7 words';}
   else{document.getElementById('challengeModal').classList.add('show');document.getElementById('modalTitle').textContent=lvl.planet+' '+lvl.name+' — Choose Mode';}
-  document.getElementById('gameScreen').className='overlay on';
+  document.getElementById('gameScreen').className='overlay off-r';
   document.querySelector('.nav-bar').classList.add('nav-hidden');
 }
 
@@ -1205,23 +1210,27 @@ function goBack(){
   document.getElementById('challengeModal').classList.remove('show');
   document.getElementById('gameScreen').className='overlay off-r';
   document.querySelector('.nav-bar').classList.remove('nav-hidden');
+  document.getElementById('constellation').classList.remove('has-timer');
   starTint=[255,255,255];
 }
 
 function startChallenge(mode){
   challengeMode=mode;
   document.getElementById('challengeModal').classList.remove('show');
+  document.getElementById('gameScreen').className='overlay on';
+  document.getElementById('constellation').classList.add('has-timer');
   const bar=document.getElementById('challengeBar');
   const icons={speed:'⚡',hard:'🔥',perfect:'⭐'};
   const labels={speed:'SPEED RUN',hard:'HARD MODE',perfect:'PERFECTIONIST'};
   bar.className='challenge-bar '+mode;bar.style.display='flex';
+  updateCrosswordScale();
   document.getElementById('chModeIcon').textContent=icons[mode];
   document.getElementById('chModeLabel').textContent=labels[mode];
   document.getElementById('gnSub').textContent=mode==='speed'?'60 seconds!':mode==='hard'?'No hints allowed':'Find every word!';
   if(mode==='speed'){timeLeft=60;startTimer();}
 }
 
-function startNormal(){document.getElementById('challengeModal').classList.remove('show');document.getElementById('challengeBar').style.display='none';document.getElementById('gnSub').textContent=`Find all ${lvl.required.length} words`;}
+function startNormal(){document.getElementById('challengeModal').classList.remove('show');document.getElementById('gameScreen').className='overlay on';document.getElementById('constellation').classList.remove('has-timer');document.getElementById('challengeBar').style.display='none';updateCrosswordScale();document.getElementById('gnSub').textContent=`Find all ${lvl.required.length} words`;}
 
 function startTimer(){
   timerInterval=setInterval(()=>{
@@ -1260,6 +1269,13 @@ function buildCrossword(){
   const cellMap={};
   lvl.placements.forEach(p=>{for(let i=0;i<p.word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,k=`${r},${c}`;if(!cellMap[k])cellMap[k]={letter:p.word[i]};}});
   Object.entries(cellMap).forEach(([k,d])=>{const[r,c]=k.split(',').map(Number),slot=document.createElement('div');slot.className='cw-slot';slot.id=`sl-${r}-${c}`;slot.style.left=((c-minC)*STEP)+'px';slot.style.top=((r-minR)*STEP)+'px';canvas.appendChild(slot);});
+  updateCrosswordScale();
+}
+function updateCrosswordScale(){
+  const canvas=document.getElementById('cwCanvas');const challengeBar=document.getElementById('challengeBar');
+  if(!canvas)return;
+  const barVisible=challengeBar&&challengeBar.style.display!=='none';
+  canvas.style.transform=barVisible?'scale(0.85)':'scale(1)';
 }
 function revealWord(word){
   let minR=99,minC=99;lvl.placements.forEach(p=>{minR=Math.min(minR,p.row);minC=Math.min(minC,p.col);});
@@ -1328,6 +1344,20 @@ function nextLevel(){document.getElementById('winOv').classList.remove('show');g
 function doShuffle(){if(challengeMode==='hard')return;const a=lvl.letters;for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}buildOrb();resetSel();}
 function doHint(){if(challengeMode==='hard')return;const coins=+document.getElementById('gameCoins').textContent;if(coins<10)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[0];document.getElementById('gameCoins').textContent=coins-10;resetSel();for(const letter of word){const pos=lpos.find(p=>p.letter===letter&&!sel.some(s=>s.index===p.index));if(pos)sel.push(pos);}updateNodes();updateCurLetters();updateSvg();setTimeout(trySubmit,900);}
 function doScan(){const coins=+document.getElementById('gameCoins').textContent;if(coins<15)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[Math.floor(Math.random()*rem.length)],p=lvl.placements.find(x=>x.word===word);const hidden=[];for(let i=0;i<word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,slot=document.getElementById(`sl-${r}-${c}`);if(slot&&!slot.classList.contains('revealed'))hidden.push({r,c,letter:word[i]});}if(!hidden.length)return;document.getElementById('gameCoins').textContent=coins-15;const cell=hidden[Math.floor(Math.random()*hidden.length)],slot=document.getElementById(`sl-${cell.r}-${cell.c}`);slot.classList.add('revealed','t-'+lvl.theme);slot.textContent=cell.letter;}
+
+/* ── MODAL SWIPE ── */
+let modalStartY=0;
+const modalSheet=document.querySelector('.modal-sheet');
+if(modalSheet){
+  modalSheet.addEventListener('touchstart',e=>{modalStartY=e.touches[0].clientY;},{passive:true});
+  modalSheet.addEventListener('touchmove',e=>{
+    const currentY=e.touches[0].clientY;
+    const diff=currentY-modalStartY;
+    if(diff>80&&document.getElementById('challengeModal').classList.contains('show')){
+      document.getElementById('challengeModal').classList.remove('show');
+    }
+  },{passive:true});
+}
 
 buildCrossword();buildOrb();
 </script>
