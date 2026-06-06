@@ -2597,23 +2597,29 @@ renderPlanetUI();
    AUTH / ONBOARDING
 ══════════════════════════════════ */
 (function _initAuthFlow(){
-  // If already authed → skip both screens
-  try{
-    const saved=localStorage.getItem('swAuth');
-    if(saved){const a=JSON.parse(saved);if(a&&a.uid){_completeAuth(a,true);return;}}
-  }catch(e){}
-
-  // Show splash, then after 2.2s transition to auth
+  // Variant B: always show the splash. After it, remembered users go straight
+  // into the game; new / logged-out users see the auth screen.
   const splash=document.getElementById('splashScreen');
   const auth=document.getElementById('authScreen');
+
+  let savedAuth=null;
+  try{
+    const saved=localStorage.getItem('swAuth');
+    if(saved){const a=JSON.parse(saved);if(a&&a.uid)savedAuth=a;}
+  }catch(e){}
 
   setTimeout(()=>{
     splash.classList.add('out');
     setTimeout(()=>{
       splash.style.display='none';
-      auth.style.display='flex';
-      // Small delay so display:flex takes effect before animating in
-      requestAnimationFrame(()=>{auth.style.opacity='0';requestAnimationFrame(()=>{auth.style.transition='opacity .45s ease';auth.style.opacity='1';});});
+      if(savedAuth){
+        // remembered session → enter game directly after the splash
+        _completeAuth(savedAuth,true);
+      } else {
+        auth.style.display='flex';
+        // Small delay so display:flex takes effect before animating in
+        requestAnimationFrame(()=>{auth.style.opacity='0';requestAnimationFrame(()=>{auth.style.transition='opacity .45s ease';auth.style.opacity='1';});});
+      }
     },550);
   },2200);
 })();
