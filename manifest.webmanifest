@@ -1,0 +1,34 @@
+{
+  "name": "Stellar Words",
+  "short_name": "Stellar Words",
+  "description": "A mobile-first space word-puzzle game — connect letters, reveal hidden words across planets.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./space-words.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#04060f",
+  "theme_color": "#04060f",
+  "categories": ["games", "puzzle"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

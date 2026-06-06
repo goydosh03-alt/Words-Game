@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Stellar Words</title>
+<!-- ── PWA ── -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04060f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stellar Words">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;background:#04060f;display:flex;justify-content:center;align-items:center}
 #starCanvas{position:fixed;inset:0;z-index:0;width:100%;height:100%}
 
 .phone{position:relative;z-index:1;width:390px;height:844px;overflow:hidden}
-@media(max-width:420px){.phone{width:100vw;height:100dvh}}
+@media(max-width:600px){.phone{width:100vw;height:100dvh;border-radius:0}}
 
 /* ────────────────────────────────
    BOTTOM NAV BAR — Floating Pill (iOS 18 style)
@@ -24,7 +33,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
   /* Чистий glass — нуль заливки, тільки blur */
   background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(32px) saturate(1.9) brightness(1.06);
+  backdrop-filter:blur(18px) saturate(1.9) brightness(1.06);
   -webkit-backdrop-filter:blur(4px) saturate(1.9) brightness(1.06);
 
   border-radius:36px;
@@ -238,7 +247,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .ps.on{filter:none;text-shadow:0 0 10px rgba(255,200,50,.9)}
 .p-card{
   flex:1;min-width:0;
-  background:rgba(255,255,255,.055);backdrop-filter:blur(20px);
+  background:rgba(255,255,255,.055);backdrop-filter:blur(16px);
   border:1px solid rgba(255,255,255,.1);border-radius:20px;
   padding:12px 14px;margin:0 12px;
 }
@@ -695,7 +704,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 }
 
 .game-nav{position:relative;z-index:3;padding:50px 18px 10px;display:flex;align-items:center;gap:10px}
-.back-btn{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.07);backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(255,255,255,.8);cursor:pointer;transition:transform .18s}
+.back-btn{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.07);backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(255,255,255,.8);cursor:pointer;transition:transform .18s}
 .back-btn:active{transform:scale(.88)}
 .gn-info{flex:1;min-width:0}
 .gn-planet{font-size:17px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -746,7 +755,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .orb-ring{position:absolute;inset:-8px;border-radius:50%;animation:orbSpin 10s linear infinite;filter:blur(5px);opacity:.5;transition:background 1s ease,opacity .3s}
 .orb.active .orb-ring{opacity:.9}
 @keyframes orbSpin{to{transform:rotate(360deg)}}
-.orb-dome{position:absolute;inset:0;border-radius:50%;backdrop-filter:blur(32px) saturate(1.4);background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 40%,rgba(0,0,0,.06) 100%);border:1px solid rgba(255,255,255,.17);box-shadow:0 8px 40px rgba(0,0,0,.35),inset 0 1.5px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.15)}
+.orb-dome{position:absolute;inset:0;border-radius:50%;backdrop-filter:blur(18px) saturate(1.4);background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 40%,rgba(0,0,0,.06) 100%);border:1px solid rgba(255,255,255,.17);box-shadow:0 8px 40px rgba(0,0,0,.35),inset 0 1.5px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.15)}
 .orb-dome::before{content:'';position:absolute;top:8%;left:16%;width:36%;height:20%;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 60%,transparent);filter:blur(2px)}
 .orb-dome::after{content:'';position:absolute;bottom:10%;left:25%;width:50%;height:8%;border-radius:50%;background:linear-gradient(to top,rgba(255,255,255,.07),transparent);filter:blur(3px)}
 .orb-iglow{position:absolute;top:50%;left:50%;width:81px;height:81px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);transition:all .4s ease;pointer-events:none}
@@ -754,7 +763,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .orb-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
 .ln-solid{stroke-width:2.5;stroke-linecap:round;fill:none}
 .ln-dash{stroke-width:1.5;stroke-linecap:round;fill:none;stroke-dasharray:5 5}
-.lnode{position:absolute;width:46px;height:46px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;z-index:3;cursor:pointer;background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.88);box-shadow:0 4px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.17);transition:all .15s cubic-bezier(.34,1.56,.64,1)}
+.lnode{position:absolute;width:46px;height:46px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;z-index:3;cursor:pointer;background:rgba(255,255,255,.06);backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.88);box-shadow:0 4px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.17);transition:all .15s cubic-bezier(.34,1.56,.64,1)}
 .lnode.sel{border-color:rgba(200,160,255,.7);color:#fff;transform:translate(-50%,-50%) scale(1.17)}
 .lnode.sel.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.45),rgba(160,70,15,.3));box-shadow:0 0 22px rgba(210,110,30,.65),inset 0 1px 0 rgba(255,200,120,.25);text-shadow:0 0 12px rgba(255,170,70,1)}
 .lnode.sel.t-venus{background:linear-gradient(145deg,rgba(210,170,30,.45),rgba(170,130,10,.3));box-shadow:0 0 22px rgba(210,170,30,.65),inset 0 1px 0 rgba(255,240,140,.25);text-shadow:0 0 12px rgba(255,230,70,1)}
@@ -762,7 +771,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .lnode.sel.t-mars{background:linear-gradient(145deg,rgba(210,50,25,.45),rgba(170,25,10,.3));box-shadow:0 0 22px rgba(210,50,25,.65),inset 0 1px 0 rgba(255,175,135,.25);text-shadow:0 0 12px rgba(255,125,75,1)}
 
 .game-actions{position:relative;z-index:3;display:flex;justify-content:center;gap:12px;padding:0 18px 24px}
-.act-btn{flex:1;max-width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);border-radius:17px;padding:9px 6px;cursor:pointer;transition:transform .2s}
+.act-btn{flex:1;max-width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.05);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.09);border-radius:17px;padding:9px 6px;cursor:pointer;transition:transform .2s}
 .act-btn:active{transform:scale(.91)}
 .act-icon{font-size:21px}
 .act-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -881,7 +890,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .faq-item.open .faq-a{max-height:120px;padding-bottom:13px}
 
 /* Win — iOS bottom sheet */
-.win-ov{display:none;position:fixed;inset:0;z-index:80;flex-direction:column;justify-content:flex-end;background:rgba(4,6,15,.72);backdrop-filter:blur(20px)}
+.win-ov{display:none;position:fixed;inset:0;z-index:80;flex-direction:column;justify-content:flex-end;background:rgba(4,6,15,.72);backdrop-filter:blur(16px)}
 .win-ov.show{display:flex}
 .win-ov.show .win-sheet{animation:sheetUp .46s cubic-bezier(.22,1,.36,1) both}
 @keyframes sheetUp{from{transform:translateY(100%);opacity:.6}to{transform:translateY(0);opacity:1}}
@@ -2020,9 +2029,30 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 /* ── STARS ── */
 const cvs=document.getElementById('starCanvas'),c2=cvs.getContext('2d');
 let ST=[],starTint=[255,255,255];
-function rCvs(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;ST=Array.from({length:220},()=>({x:Math.random()*cvs.width,y:Math.random()*cvs.height,r:Math.random()*1.4+.2,tw:Math.random()*Math.PI*2,sp:Math.random()*.007+.003}));}
-function drawST(){c2.clearRect(0,0,cvs.width,cvs.height);const t=Date.now()*.001,[sr,sg,sb]=starTint;ST.forEach(s=>{const a=.2+.6*Math.sin(t*s.sp*55+s.tw);c2.beginPath();c2.arc(s.x,s.y,s.r,0,Math.PI*2);c2.fillStyle=`rgba(${sr},${sg},${sb},${a})`;c2.fill();if(s.r>1.1&&Math.sin(t*.22+s.tw)>.75){c2.strokeStyle=`rgba(${sr},${sg},${sb},${a*.4})`;c2.lineWidth=.35;c2.beginPath();c2.moveTo(s.x-5,s.y);c2.lineTo(s.x+5,s.y);c2.stroke();c2.beginPath();c2.moveTo(s.x,s.y-5);c2.lineTo(s.x,s.y+5);c2.stroke();}});requestAnimationFrame(drawST);}
-window.addEventListener('resize',rCvs);rCvs();drawST();
+let cvw=0,cvh=0;
+function rCvs(){
+  // DPR з обмеженням 2 — на retina не палимо GPU зайвим перемальовуванням,
+  // але картинка лишається чіткою (раніше DPR не враховувався → розмито).
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  cvw=window.innerWidth;cvh=window.innerHeight;
+  cvs.width=Math.round(cvw*dpr);cvs.height=Math.round(cvh*dpr);
+  cvs.style.width=cvw+'px';cvs.style.height=cvh+'px';
+  c2.setTransform(dpr,0,0,dpr,0,0);
+  // Густина зірок за площею, але не більше 110 (раніше було 220 завжди).
+  const count=Math.max(50,Math.min(110,Math.round(cvw*cvh/8500)));
+  ST=Array.from({length:count},()=>({x:Math.random()*cvw,y:Math.random()*cvh,r:Math.random()*1.4+.2,tw:Math.random()*Math.PI*2,sp:Math.random()*.007+.003}));
+}
+let _lastST=0;
+function drawST(now){
+  requestAnimationFrame(drawST);
+  // Пауза коли вкладка прихована + ліміт ~30 fps (раніше малювалось без обмежень).
+  if(document.hidden)return;
+  if(now-_lastST<33)return;_lastST=now;
+  c2.clearRect(0,0,cvw,cvh);
+  const t=Date.now()*.001,[sr,sg,sb]=starTint;
+  ST.forEach(s=>{const a=.2+.6*Math.sin(t*s.sp*55+s.tw);c2.beginPath();c2.arc(s.x,s.y,s.r,0,Math.PI*2);c2.fillStyle=`rgba(${sr},${sg},${sb},${a})`;c2.fill();if(s.r>1.1&&Math.sin(t*.22+s.tw)>.75){c2.strokeStyle=`rgba(${sr},${sg},${sb},${a*.4})`;c2.lineWidth=.35;c2.beginPath();c2.moveTo(s.x-5,s.y);c2.lineTo(s.x+5,s.y);c2.stroke();c2.beginPath();c2.moveTo(s.x,s.y-5);c2.lineTo(s.x,s.y+5);c2.stroke();}});
+}
+window.addEventListener('resize',rCvs);rCvs();requestAnimationFrame(drawST);
 
 /* ── TIMER ── */
 function getCountdown(){const now=new Date(),midnight=new Date();midnight.setHours(24,0,0,0);const d=midnight-now,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
@@ -2159,6 +2189,8 @@ try{const _s=localStorage.getItem('swState');STATE=_s?Object.assign(_defState(),
 if(!Array.isArray(STATE.unlocked))STATE.unlocked=[0,1];
 if(typeof STATE.stars!=='object'||!STATE.stars)STATE.stars={0:2,1:1};
 if(!Array.isArray(STATE.completed))STATE.completed=[];
+// coins має бути валідним числом, інакше зіпсований save заклинить економіку/UI
+if(typeof STATE.coins!=='number'||!isFinite(STATE.coins)||STATE.coins<0)STATE.coins=120;
 function saveState(){try{localStorage.setItem('swState',JSON.stringify({coins:STATE.coins,unlocked:STATE.unlocked,stars:STATE.stars,completed:STATE.completed}));}catch(e){}}
 function updateCoinsDisplay(){
   const c=STATE.coins;
@@ -2443,6 +2475,16 @@ function updateCrosswordScale(){
     canvas.style.transform=`scale(${scale})`;
   });
 }
+// Перерахунок масштабу при будь-якій зміні розміру контейнера (поворот, resize,
+// поява екрана після transition) — фікс кривого кросворда на старті/повороті.
+(function _watchCrosswordSize(){
+  const container=document.getElementById('constellation');
+  if(container&&'ResizeObserver'in window){
+    let raf;new ResizeObserver(()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(updateCrosswordScale);}).observe(container);
+  }
+  window.addEventListener('resize',updateCrosswordScale);
+  window.addEventListener('orientationchange',()=>setTimeout(updateCrosswordScale,250));
+})();
 function revealWord(word){
   let minR=99,minC=99;lvl.placements.forEach(p=>{minR=Math.min(minR,p.row);minC=Math.min(minC,p.col);});
   const p=lvl.placements.find(x=>x.word===word);if(!p)return;
@@ -2455,23 +2497,28 @@ function buildOrb(){
   const cx=104,cy=104,r=72;
   lvl.letters.forEach((letter,i)=>{const a=(i/lvl.letters.length)*Math.PI*2-Math.PI/2,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);lpos.push({x,y,letter,index:i});const node=document.createElement('div');node.className='lnode';node.id=`ln-${i}`;node.textContent=letter;node.style.left=x+'px';node.style.top=y+'px';document.getElementById('orb').appendChild(node);});
 }
-function getNodeAt(cx,cy){const rect=document.getElementById('orb').getBoundingClientRect(),px=cx-rect.left,py=cy-rect.top;return lpos.find(p=>{const dx=px-p.x,dy=py-p.y;return dx*dx+dy*dy<28*28;})||null;}
+function getNodeAt(cx,cy){const rect=document.getElementById('orb').getBoundingClientRect();const sc=rect.width/208||1;const px=(cx-rect.left)/sc,py=(cy-rect.top)/sc;const hr=28/* в координатах 208 */;return lpos.find(p=>{const dx=px-p.x,dy=py-p.y;return dx*dx+dy*dy<hr*hr;})||null;}
 function updateSvg(curX,curY){
   const svg=document.getElementById('orbSvg');svg.innerHTML='';
   const cols={mercury:'rgba(220,140,60,.85)',venus:'rgba(230,200,60,.85)',earth:'rgba(80,160,255,.85)',mars:'rgba(230,80,40,.85)'};
   const col=cols[lvl.theme]||'rgba(200,170,255,.85)';
   const pts=sel.map(s=>lpos[s.index]);
   for(let i=0;i<pts.length-1;i++){const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',pts[i].x);l.setAttribute('y1',pts[i].y);l.setAttribute('x2',pts[i+1].x);l.setAttribute('y2',pts[i+1].y);l.setAttribute('class','ln-solid');l.setAttribute('stroke',col);svg.appendChild(l);}
-  if(dragging&&pts.length>0&&curX!==undefined){const rect=document.getElementById('orb').getBoundingClientRect(),last=pts[pts.length-1],l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',last.x);l.setAttribute('y1',last.y);l.setAttribute('x2',curX-rect.left);l.setAttribute('y2',curY-rect.top);l.setAttribute('class','ln-dash');l.setAttribute('stroke',col.replace('.85','.35'));svg.appendChild(l);}
+  if(dragging&&pts.length>0&&curX!==undefined){const rect=document.getElementById('orb').getBoundingClientRect(),sc=rect.width/208||1,last=pts[pts.length-1],l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',last.x);l.setAttribute('y1',last.y);l.setAttribute('x2',(curX-rect.left)/sc);l.setAttribute('y2',(curY-rect.top)/sc);l.setAttribute('class','ln-dash');l.setAttribute('stroke',col.replace('.85','.35'));svg.appendChild(l);}
 }
 function updateNodes(){const idxs=new Set(sel.map(s=>s.index));lpos.forEach((_,i)=>{const n=document.getElementById(`ln-${i}`);n.classList.remove('sel','t-mercury','t-venus','t-earth','t-mars','t-jupiter','t-saturn');if(idxs.has(i))n.classList.add('sel','t-'+lvl.theme);});document.getElementById('orb').classList.toggle('active',idxs.size>0);}
 function updateCurLetters(){const wrap=document.getElementById('curLetters');wrap.innerHTML='';sel.forEach(s=>{const el=document.createElement('div');el.className='cur-l t-'+lvl.theme;el.textContent=s.letter;wrap.appendChild(el);});}
-function onStart(e){e.preventDefault();dragging=true;sel=[];const pt=e.touches?e.touches[0]:e,pos=getNodeAt(pt.clientX,pt.clientY);if(pos){sel.push(pos);updateNodes();updateCurLetters();}updateSvg(pt.clientX,pt.clientY);}
-function onMove(e){e.preventDefault();if(!dragging)return;const pt=e.touches?e.touches[0]:e,pos=getNodeAt(pt.clientX,pt.clientY);if(pos){const ai=sel.findIndex(s=>s.index===pos.index);if(ai===-1){sel.push(pos);updateNodes();updateCurLetters();}else if(ai===sel.length-2){sel.pop();updateNodes();updateCurLetters();}}updateSvg(pt.clientX,pt.clientY);}
-function onEnd(e){e.preventDefault();dragging=false;updateSvg();trySubmit();}
+// locked — блокує ручний ввід під час автопідказки/таймера, щоб не псувати sel
+let locked=false;
+function onStart(e){if(locked)return;e.preventDefault();dragging=true;sel=[];const pos=getNodeAt(e.clientX,e.clientY);if(pos){sel.push(pos);updateNodes();updateCurLetters();}updateSvg(e.clientX,e.clientY);}
+function onMove(e){if(!dragging||locked)return;e.preventDefault();const pos=getNodeAt(e.clientX,e.clientY);if(pos){const ai=sel.findIndex(s=>s.index===pos.index);if(ai===-1){sel.push(pos);updateNodes();updateCurLetters();}else if(ai===sel.length-2){sel.pop();updateNodes();updateCurLetters();}}updateSvg(e.clientX,e.clientY);}
+function onEnd(e){if(!dragging)return;e.preventDefault();dragging=false;updateSvg();trySubmit();}
 const orbEl=document.getElementById('orb');
-orbEl.addEventListener('touchstart',onStart,{passive:false});orbEl.addEventListener('touchmove',onMove,{passive:false});orbEl.addEventListener('touchend',onEnd,{passive:false});
-orbEl.addEventListener('mousedown',onStart);document.addEventListener('mousemove',e=>{if(dragging)onMove(e);});document.addEventListener('mouseup',e=>{if(dragging)onEnd(e);});
+// Єдина система вводу через Pointer Events (тач + миша + стилус), із захопленням покажчика
+orbEl.addEventListener('pointerdown',e=>{onStart(e);try{orbEl.setPointerCapture(e.pointerId);}catch(_){}} ,{passive:false});
+orbEl.addEventListener('pointermove',onMove,{passive:false});
+orbEl.addEventListener('pointerup',onEnd,{passive:false});
+orbEl.addEventListener('pointercancel',e=>{dragging=false;updateSvg();resetSel();});
 
 /* ── SUBMIT ── */
 function trySubmit(){
@@ -2486,7 +2533,6 @@ function trySubmit(){
     resetSel();
     if(lvl.required.every(w=>found.has(w))){stopTimer();setTimeout(showWin,750);}
   } else {
-    if(challengeMode==='hard'&&word.length<2){resetSel();return;}
     document.getElementById('curLetters').classList.add('shake');
     setTimeout(()=>{document.getElementById('curLetters').classList.remove('shake');resetSel();},420);
   }
@@ -2498,17 +2544,20 @@ function showBonus(word){const c=document.getElementById('constellation'),t=docu
 function showWin(){
   const bonus=[...found].filter(w=>!lvl.required.includes(w)).length;
   const allFound=found.size>=lvl.words.length;
-  const stars=allFound?3:bonus>=2?2:bonus>=1?2:1;
+  const stars=allFound?3:bonus>=1?2:1;
   const mult=challengeMode==='daily'?3:challengeMode==='speed'?2:challengeMode==='perfect'?4:1;
   const earnedCoins=(stars*15+5*lvl.required.length)*mult;
   const earnedXp=(stars*25+lvl.required.length*10)*mult;
-  // Persist to STATE
+  // Монети нараховуються завжди
   STATE.coins+=earnedCoins;
-  STATE.stars[lvlIdx]=Math.max(STATE.stars[lvlIdx]||0,stars);
-  if(!STATE.completed.includes(lvlIdx))STATE.completed.push(lvlIdx);
-  // Auto-unlock next planet
-  const next=lvlIdx+1;
-  if(next<LEVELS.length&&!STATE.unlocked.includes(next))STATE.unlocked.push(next);
+  // Прогрес планет (зірки/completed/розблок) пишемо ЛИШЕ для звичайних рівнів,
+  // НЕ для Daily — інакше Daily безкоштовно відкривав би наступну планету.
+  if(challengeMode!=='daily'){
+    STATE.stars[lvlIdx]=Math.max(STATE.stars[lvlIdx]||0,stars);
+    if(!STATE.completed.includes(lvlIdx))STATE.completed.push(lvlIdx);
+    const next=lvlIdx+1;
+    if(next<LEVELS.length&&!STATE.unlocked.includes(next))STATE.unlocked.push(next);
+  }
   saveState();renderPlanetUI();
   document.getElementById('gameCoins').textContent=STATE.coins;
   document.getElementById('wrXp').textContent='+'+earnedXp;
@@ -2522,7 +2571,7 @@ function nextLevel(){document.getElementById('winOv').classList.remove('show');g
 
 /* ── ACTIONS ── */
 function doShuffle(){if(challengeMode==='hard')return;const a=lvl.letters;for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}buildOrb();resetSel();}
-function doHint(){if(challengeMode==='hard')return;if(STATE.coins<10)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[0];STATE.coins-=10;saveState();document.getElementById('gameCoins').textContent=STATE.coins;updateCoinsDisplay();resetSel();for(const letter of word){const pos=lpos.find(p=>p.letter===letter&&!sel.some(s=>s.index===p.index));if(pos)sel.push(pos);}updateNodes();updateCurLetters();updateSvg();setTimeout(trySubmit,900);}
+function doHint(){if(challengeMode==='hard'||locked)return;if(STATE.coins<10)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[0];STATE.coins-=10;saveState();document.getElementById('gameCoins').textContent=STATE.coins;updateCoinsDisplay();dragging=false;resetSel();locked=true;for(const letter of word){const pos=lpos.find(p=>p.letter===letter&&!sel.some(s=>s.index===p.index));if(pos)sel.push(pos);}updateNodes();updateCurLetters();updateSvg();setTimeout(()=>{locked=false;trySubmit();},900);}
 function doScan(){if(STATE.coins<15)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[Math.floor(Math.random()*rem.length)],p=lvl.placements.find(x=>x.word===word);const hidden=[];for(let i=0;i<word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,slot=document.getElementById(`sl-${r}-${c}`);if(slot&&!slot.classList.contains('revealed'))hidden.push({r,c,letter:word[i]});}if(!hidden.length)return;STATE.coins-=15;saveState();document.getElementById('gameCoins').textContent=STATE.coins;updateCoinsDisplay();const cell=hidden[Math.floor(Math.random()*hidden.length)],slot=document.getElementById(`sl-${cell.r}-${cell.c}`);slot.classList.add('revealed','t-'+lvl.theme);slot.textContent=cell.letter;}
 
 /* ── MODAL SWIPE ── */
@@ -2633,6 +2682,14 @@ function _completeAuth(authData,silent){
     if(auth)auth.style.display='none';
     if(splash)splash.style.display='none';
   }
+}
+</script>
+<!-- ── PWA: реєстрація service worker (офлайн + встановлення на телефон) ── -->
+<script>
+if('serviceWorker'in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
 }
 </script>
 </body>
