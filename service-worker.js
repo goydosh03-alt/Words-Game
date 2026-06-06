@@ -4,11 +4,13 @@
    • Локальні запити — cache-first з фоновим оновленням (stale-while-revalidate).
    • Картинки планет з CDN — runtime-кеш (працює офлайн після першого завантаження).
    Версію кеша піднімай при кожному релізі, щоб юзери отримали оновлення. */
-const VERSION = 'stellar-words-v2';
+const VERSION = 'stellar-words-v3';
 const SHELL = [
   './',
   './space-words.html',
   './manifest.webmanifest',
+  './assets/stellar-words-logo.png',
+  './assets/stellar-words-emblem.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png'

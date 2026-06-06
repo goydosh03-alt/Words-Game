@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Stellar Words — Space Word Puzzle</title>
-<meta name="description" content="Connect letters, reveal hidden words, explore planets. A free space word-puzzle game you can play in your browser or install on your phone.">
+<title>Stellar Words — Space Word Puzzle Game</title>
+<meta name="description" content="Connect letters on a spinning orb, reveal hidden words, and explore the planets. A free space word-puzzle game — play in your browser or install on your phone.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#04060f">
 <meta name="mobile-web-app-capable" content="yes">
@@ -13,7 +13,6 @@
 <meta name="apple-mobile-web-app-title" content="Stellar Words">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
-<!-- Open Graph (гарний прев'ю при шерінгу посилання) -->
 <meta property="og:title" content="Stellar Words">
 <meta property="og:description" content="A space word-puzzle game. Play in your browser or install on your phone.">
 <meta property="og:image" content="icons/icon-512.png">
@@ -22,167 +21,283 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#04060f;
+  --bg2:#070b1a;
   --accent:#5a9bff;
-  --accent2:#8a6bff;
-  --text:#eaf0ff;
-  --muted:#9fb0d6;
-  --glass:rgba(255,255,255,.06);
-  --glass-border:rgba(255,255,255,.12);
+  --accent2:#9a6bff;
+  --text:#eef2ff;
+  --muted:#9aabd4;
+  --card:rgba(255,255,255,.045);
+  --card-border:rgba(255,255,255,.10);
+  --radius:22px;
+  --maxw:1120px;
 }
-html,body{height:100%}
+html{scroll-behavior:smooth}
 body{
-  font-family:-apple-system,'SF Pro Display','Helvetica Neue',system-ui,sans-serif;
-  background:
-    radial-gradient(ellipse at 50% -10%,rgba(60,90,200,.25),transparent 55%),
-    radial-gradient(ellipse at 80% 110%,rgba(120,80,255,.18),transparent 50%),
-    var(--bg);
-  color:var(--text);
-  min-height:100dvh;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  text-align:center;
-  padding:28px 22px calc(28px + env(safe-area-inset-bottom));
-  overflow-x:hidden;position:relative;
+  font-family:-apple-system,'SF Pro Display','Helvetica Neue',system-ui,Arial,sans-serif;
+  color:var(--text);background:var(--bg);
+  line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased;
 }
-/* Зоряний фон (легкий, чистий CSS) */
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.container{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 22px}
 .stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.stars i{position:absolute;background:#fff;border-radius:50%;opacity:.5;animation:tw 3.4s ease-in-out infinite}
-@keyframes tw{0%,100%{opacity:.2}50%{opacity:.85}}
+.stars i{position:absolute;background:#fff;border-radius:50%;opacity:.5;animation:tw 3.6s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.18}50%{opacity:.8}}
 
-.wrap{position:relative;z-index:1;max-width:440px;width:100%;display:flex;flex-direction:column;align-items:center}
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-weight:800;font-size:16px;letter-spacing:.2px;cursor:pointer;border:none;
+  padding:15px 26px;border-radius:16px;transition:transform .15s ease,box-shadow .2s ease,background .2s ease}
+.btn:active{transform:scale(.96)}
+.btn-primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 12px 30px rgba(80,110,255,.4),inset 0 1px 0 rgba(255,255,255,.3)}
+.btn-ghost{color:var(--text);background:var(--card);border:1px solid var(--card-border)}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
 
-/* Планета */
-.planet-box{position:relative;width:168px;height:168px;margin-bottom:8px}
-.planet-box::before{
-  content:'';position:absolute;inset:-26px;border-radius:50%;
-  background:radial-gradient(circle,rgba(90,155,255,.45),transparent 68%);
-  filter:blur(14px);animation:breathe 5s ease-in-out infinite;
+/* ── Header ── */
+header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(4,6,15,.55);border-bottom:1px solid rgba(255,255,255,.06)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:850;font-size:18px;letter-spacing:-.3px}
+.logo img{width:30px;height:30px;border-radius:9px}
+.logo b{background:linear-gradient(180deg,#fff,#b9caff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav .btn{padding:10px 18px;font-size:14.5px}
+
+/* ── Hero ── */
+.hero{position:relative;z-index:1;padding:clamp(40px,7vw,86px) 0 clamp(30px,5vw,60px);
+  background:
+    radial-gradient(ellipse 80% 60% at 70% -10%,rgba(70,100,210,.28),transparent 60%),
+    radial-gradient(ellipse 60% 50% at 0% 30%,rgba(140,90,255,.16),transparent 55%);}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:clamp(34px,5vw,56px);align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.5px;
+  color:var(--accent);background:rgba(90,155,255,.12);border:1px solid rgba(90,155,255,.25);
+  padding:7px 14px;border-radius:999px;text-transform:uppercase}
+h1{font-size:clamp(38px,7vw,62px);line-height:1.04;font-weight:880;letter-spacing:-1.2px;margin:20px 0 0;
+  background:linear-gradient(180deg,#fff 30%,#a9c0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{color:var(--muted);font-size:clamp(16px,2.4vw,19px);margin-top:18px;max-width:520px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.trust{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;color:var(--muted);font-size:13.5px}
+.trust span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+
+/* ── Device mockup ── */
+.device-wrap{display:flex;justify-content:center;position:relative}
+.device-wrap::after{content:'';position:absolute;width:80%;height:80%;left:10%;top:8%;
+  background:radial-gradient(circle,rgba(90,140,255,.35),transparent 70%);filter:blur(40px);z-index:-1}
+.device{position:relative;width:100%;max-width:300px;aspect-ratio:1170/2532;
+  background:#0a0e1a;border-radius:46px;padding:11px;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 50px 90px -28px rgba(0,4,30,.85),inset 0 1px 0 rgba(255,255,255,.12);
+  animation:float 6s ease-in-out infinite}
+.device::before{content:'';position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  width:34%;height:22px;background:#0a0e1a;border-radius:0 0 16px 16px;z-index:3}
+.device img,.device video{width:100%;height:100%;object-fit:cover;border-radius:36px;display:block}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ── Section base ── */
+section.block{position:relative;z-index:1;padding:clamp(54px,8vw,96px) 0}
+.section-head{text-align:center;max-width:640px;margin:0 auto clamp(34px,5vw,54px)}
+.section-head h2{font-size:clamp(28px,4.5vw,44px);font-weight:850;letter-spacing:-.8px;
+  background:linear-gradient(180deg,#fff,#aebfee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.section-head p{color:var(--muted);font-size:clamp(15px,2vw,18px);margin-top:14px}
+
+/* ── Features ── */
+.features{display:grid;grid-template-columns:1fr;gap:18px}
+.feature{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);
+  padding:26px 24px;transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.feature:hover{transform:translateY(-5px);border-color:rgba(90,155,255,.35);background:rgba(255,255,255,.06)}
+.feature .ic{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-size:24px;
+  background:linear-gradient(135deg,rgba(90,155,255,.25),rgba(154,107,255,.25));
+  border:1px solid rgba(255,255,255,.12);margin-bottom:16px}
+.feature h3{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.feature p{color:var(--muted);font-size:14.5px;margin-top:8px}
+
+/* ── Showcase (screenshots row) ── */
+.showcase{margin-top:clamp(40px,6vw,68px);display:grid;grid-template-columns:1fr;gap:34px;align-items:center}
+.shot-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px}
+.shot-card .device{max-width:260px;animation:none}
+.shot-card h4{font-size:18px;font-weight:800}
+.shot-card p{color:var(--muted);font-size:14px;max-width:300px}
+
+/* ── Install / CTA block ── */
+.cta-block{position:relative;z-index:1;padding:clamp(54px,8vw,90px) 0}
+.cta-card{background:
+    radial-gradient(ellipse at 50% 0%,rgba(90,130,255,.22),transparent 60%),
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border:1px solid var(--card-border);border-radius:30px;padding:clamp(34px,5vw,60px) clamp(22px,4vw,48px);
+  text-align:center;max-width:860px;margin:0 auto}
+.cta-card h2{font-size:clamp(26px,4vw,40px);font-weight:860;letter-spacing:-.7px}
+.cta-card p{color:var(--muted);font-size:clamp(15px,2vw,17px);margin-top:14px;max-width:520px;margin-inline:auto}
+.install-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:30px;max-width:520px;margin-inline:auto;text-align:left}
+.install-step{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--card-border);
+  border-radius:16px;padding:16px 18px}
+.install-step .n{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.install-step b{font-size:15px}.install-step span{color:var(--muted);font-size:13.5px;display:block;margin-top:2px}
+#installBtn{display:none;margin-top:24px}
+.cta-card .btn-primary{margin-top:24px;padding:17px 34px;font-size:18px}
+
+/* ── Footer ── */
+footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.07);padding:34px 0;text-align:center}
+footer .logo{justify-content:center;font-size:16px}
+footer p{color:rgba(154,171,212,.6);font-size:12.5px;margin-top:12px}
+
+/* ── Responsive: tablet/desktop ── */
+@media(min-width:760px){
+  .features{grid-template-columns:repeat(3,1fr)}
+  .showcase{grid-template-columns:repeat(3,1fr)}
+  .install-grid{grid-template-columns:1fr 1fr}
 }
-.planet-box img{position:relative;width:100%;height:100%;border-radius:32%;
-  box-shadow:0 18px 50px rgba(20,60,160,.45),inset 0 1px 0 rgba(255,255,255,.18)}
-@keyframes breathe{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
-
-h1{font-size:40px;font-weight:850;letter-spacing:-.5px;margin-top:18px;
-  background:linear-gradient(180deg,#fff,#acc4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.tag{color:var(--muted);font-size:16px;line-height:1.5;margin-top:10px;max-width:340px}
-
-/* Кнопка Грати */
-.btn-play{
-  margin-top:30px;width:100%;max-width:320px;
-  padding:18px 24px;border:none;border-radius:20px;cursor:pointer;
-  font-size:19px;font-weight:800;color:#fff;letter-spacing:.3px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  box-shadow:0 12px 34px rgba(70,110,255,.45),inset 0 1px 0 rgba(255,255,255,.3);
-  transition:transform .15s ease,box-shadow .2s ease;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;
+@media(min-width:900px){
+  .hero-grid{grid-template-columns:1.05fr .95fr}
+  .hero{padding-top:clamp(60px,7vw,104px)}
+  .hero .device{max-width:330px}
 }
-.btn-play:active{transform:scale(.96)}
-
-/* Блок встановлення */
-.install{
-  margin-top:16px;width:100%;max-width:320px;
-  background:var(--glass);border:1px solid var(--glass-border);
-  border-radius:20px;padding:18px 20px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-}
-.install h2{font-size:15px;font-weight:700;margin-bottom:6px}
-.install p{font-size:13.5px;color:var(--muted);line-height:1.55}
-.btn-install{
-  margin-top:14px;width:100%;padding:13px;border-radius:14px;cursor:pointer;
-  font-size:15px;font-weight:700;color:var(--text);
-  background:rgba(255,255,255,.08);border:1px solid var(--glass-border);
-  transition:transform .15s ease,background .2s ease;display:none;
-}
-.btn-install:active{transform:scale(.96)}
-.ios-hint{display:none;margin-top:12px;font-size:13px;color:var(--muted);line-height:1.6}
-.ios-hint b{color:var(--text)}
-.share-ic{display:inline-block;width:15px;height:15px;vertical-align:-2px;
-  border:1.6px solid var(--accent);border-radius:3px;position:relative}
-.share-ic::before{content:'↑';position:absolute;top:-9px;left:50%;transform:translateX(-50%);
-  font-size:12px;color:var(--accent);font-weight:900}
-
-.features{margin-top:26px;display:flex;gap:18px;color:var(--muted);font-size:12.5px;flex-wrap:wrap;justify-content:center}
-.features span{display:inline-flex;align-items:center;gap:5px}
-
-footer{margin-top:28px;font-size:11.5px;color:rgba(159,176,214,.6)}
 </style>
 </head>
 <body>
 <div class="stars" id="stars"></div>
 
-<div class="wrap">
-  <div class="planet-box">
-    <img src="icons/icon-512.png" alt="Stellar Words" width="168" height="168">
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="container nav">
+    <a class="logo" href="#top"><img src="assets/stellar-words-logo.png" alt="Stellar Words" style="height:34px;width:auto;display:block"></a>
+    <a class="btn btn-primary" href="space-words.html">Play</a>
   </div>
+</header>
 
-  <h1>Stellar Words</h1>
-  <p class="tag">Connect letters on a spinning orb, reveal hidden words, and explore the planets — one puzzle at a time.</p>
-
-  <a class="btn-play" href="space-words.html">🪐 &nbsp;Play now</a>
-
-  <div class="install">
-    <h2>📲 Install on your phone</h2>
-    <p>Add Stellar Words to your home screen — it opens full-screen like a real app and works offline.</p>
-    <button class="btn-install" id="installBtn">Install app</button>
-    <div class="ios-hint" id="iosHint">
-      On iPhone: tap <span class="share-ic"></span> <b>Share</b> in Safari, then <b>“Add to Home Screen”</b>.
+<!-- ══ BLOCK 1 — HERO ══ -->
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">✦ Space word puzzle</span>
+      <h1>Spell your way<br>across the galaxy</h1>
+      <p class="lead">Connect letters on a glowing orb to reveal hidden words, light up the crossword, and unlock planet after planet. A calm, beautiful word game that fits in your pocket.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="space-words.html">🪐 Play now — free</a>
+        <a class="btn btn-ghost" href="#install">Install on phone</a>
+      </div>
+      <div class="trust">
+        <span><i class="dot"></i> Free to play</span>
+        <span><i class="dot"></i> Works offline</span>
+        <span><i class="dot"></i> No app store needed</span>
+      </div>
+    </div>
+    <div class="device-wrap">
+      <div class="device">
+        <video src="screens/hero.mp4" poster="screens/hero.png" autoplay muted loop playsinline preload="auto" aria-label="Stellar Words gameplay video"></video>
+      </div>
     </div>
   </div>
+</section>
 
-  <div class="features">
-    <span>✨ Free to play</span>
-    <span>📶 Works offline</span>
-    <span>🚫 No download store</span>
+<!-- ══ BLOCK 2 — FEATURES + SHOWCASE ══ -->
+<section class="block" id="features">
+  <div class="container">
+    <div class="section-head">
+      <h2>A whole universe of words</h2>
+      <p>Simple to pick up, hard to put down — built around three things players love.</p>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="ic">🌀</div>
+        <h3>Swipe-to-spell orb</h3>
+        <p>Drag across the letters to form words. Smooth, tactile, and satisfying on every device.</p>
+      </div>
+      <div class="feature">
+        <div class="ic">🪐</div>
+        <h3>Explore the planets</h3>
+        <p>Each planet is a themed chapter with its own word set, colors, and challenge modes to master.</p>
+      </div>
+      <div class="feature">
+        <div class="ic">⚡</div>
+        <h3>Daily challenges &amp; quests</h3>
+        <p>Keep your streak alive with a fresh puzzle every day, plus quests that reward coins and gems.</p>
+      </div>
+    </div>
+
+    <div class="showcase">
+      <div class="shot-card">
+        <div class="device"><img src="screens/map.png" alt="Planet map screen" loading="lazy"></div>
+        <h4>Planet map</h4>
+        <p>Track stars, coins, and your journey from Mercury to Saturn.</p>
+      </div>
+      <div class="shot-card">
+        <div class="device"><img src="screens/game.png" alt="Gameplay screen" loading="lazy"></div>
+        <h4>The puzzle</h4>
+        <p>Letter orb below, crossword above — find every hidden word.</p>
+      </div>
+      <div class="shot-card">
+        <div class="device"><img src="screens/daily.png" alt="Daily challenge screen" loading="lazy"></div>
+        <h4>Daily &amp; streaks</h4>
+        <p>A new cosmic challenge each day with countdown and rewards.</p>
+      </div>
+    </div>
   </div>
+</section>
 
-  <footer>© 2026 Stellar Words</footer>
-</div>
+<!-- ══ BLOCK 3 — INSTALL / CTA ══ -->
+<section class="cta-block" id="install">
+  <div class="container">
+    <div class="cta-card">
+      <h2>Play anywhere. Install in seconds.</h2>
+      <p>Add Stellar Words to your home screen and it opens full-screen like a real app — even offline. No download store, no waiting.</p>
+
+      <div class="install-grid">
+        <div class="install-step">
+          <div class="n">A</div>
+          <div><b>On Android</b><span>Open in Chrome → tap the “Install app” prompt (or menu → Install app).</span></div>
+        </div>
+        <div class="install-step">
+          <div class="n">i</div>
+          <div><b>On iPhone</b><span>Open in Safari → tap Share → “Add to Home Screen”.</span></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="installBtn">⬇ Install the app</button>
+      <div><a class="btn btn-primary" href="space-words.html">🪐 Play now in your browser</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="logo"><img src="icons/icon-192.png" alt="" style="width:26px;height:26px;border-radius:8px"><span>Stellar <b>Words</b></span></div>
+    <p>© 2026 Stellar Words · Made with love among the stars</p>
+  </div>
+</footer>
 
 <script>
-// Якщо вже відкрито як встановлений застосунок — одразу в гру
+// Opened as installed PWA → jump straight into the game
 if(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone){
   location.replace('space-words.html');
 }
 
-// Легкий зоряний фон
+// Lightweight starfield
 (function(){
   const box=document.getElementById('stars');
-  const n=Math.min(70,Math.round(window.innerWidth*window.innerHeight/14000));
-  let html='';
+  const n=Math.min(90,Math.round(window.innerWidth*window.innerHeight/12000));
+  let h='';
   for(let i=0;i<n;i++){
-    const s=(Math.random()*1.8+0.6).toFixed(1);
-    html+=`<i style="left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*100).toFixed(1)}%;width:${s}px;height:${s}px;animation-delay:${(Math.random()*3.4).toFixed(1)}s"></i>`;
+    const s=(Math.random()*1.8+0.5).toFixed(1);
+    h+=`<i style="left:${(Math.random()*100).toFixed(2)}%;top:${(Math.random()*100).toFixed(2)}%;width:${s}px;height:${s}px;animation-delay:${(Math.random()*3.6).toFixed(1)}s"></i>`;
   }
-  box.innerHTML=html;
+  box.innerHTML=h;
 })();
 
-// PWA install: Android / Chrome
+// PWA install (Android/Chrome)
 let deferredPrompt=null;
 const installBtn=document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();
-  deferredPrompt=e;
-  installBtn.style.display='block';
-});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='inline-flex';});
 installBtn.addEventListener('click',async()=>{
   if(!deferredPrompt)return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt=null;
-  installBtn.style.display='none';
+  deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';
 });
 
-// iOS Safari не підтримує beforeinstallprompt → показуємо інструкцію
-(function(){
-  const ua=window.navigator.userAgent;
-  const isIOS=/iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-  const isSafari=/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
-  if(isIOS && isSafari){document.getElementById('iosHint').style.display='block';}
-})();
-
-// Реєстрація service worker (офлайн)
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('service-worker.js').catch(()=>{});
-}
+// Service worker (offline)
+if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js').catch(()=>{});}
 </script>
 </body>
 </html>

@@ -178,6 +178,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   background:linear-gradient(135deg,#fff 0%,#c0a0ff 55%,#70c0ff 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
+.map-logo-img{height:30px;width:auto;display:block;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
+.splash-logo-img{width:min(80vw,360px);height:auto;display:block;filter:drop-shadow(0 6px 28px rgba(120,90,255,.5));}
+.auth-logo-img{width:min(72vw,300px);height:auto;display:block;filter:drop-shadow(0 5px 22px rgba(120,90,255,.42));}
 .map-coins{
   display:flex;align-items:center;gap:6px;flex-shrink:0;
   background:rgba(255,190,30,.1);backdrop-filter:blur(14px);
@@ -1131,8 +1134,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   <!-- ══ SPLASH SCREEN ══ -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-logo-wrap">
-      <div class="splash-emblem">✦</div>
-      <div class="splash-title">Stellar Words</div>
+      <img class="splash-logo-img" src="assets/stellar-words-logo.png" alt="Stellar Words">
       <div class="splash-tagline">Explore the galaxy through words</div>
     </div>
     <div class="splash-dots">
@@ -1148,8 +1150,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
     <div class="auth-glow-bot"></div>
 
     <div class="auth-logo-area">
-      <div class="auth-logo-emblem">✦</div>
-      <div class="auth-logo-name">Stellar Words</div>
+      <img class="auth-logo-img" src="assets/stellar-words-logo.png" alt="Stellar Words">
       <div class="auth-logo-tagline">Explore the galaxy through words</div>
     </div>
 
@@ -1207,7 +1208,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
       <div class="map-nebula mn2"></div>
 
       <div class="map-header">
-        <div class="map-logo">✦ Stellar Words</div>
+        <img class="map-logo-img" src="assets/stellar-words-logo.png" alt="Stellar Words">
+        <div class="map-logo" style="display:none">Stellar Words</div>
         <div class="hdr-right">
           <div class="map-coins" onclick="openShop()">🪙 <span id="mapCoins">120</span></div>
           <div class="bell-btn" onclick="toggleNotifications()">🔔</div>
