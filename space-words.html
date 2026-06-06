@@ -117,6 +117,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   transition:opacity .28s ease,transform .28s ease;
   overflow:hidden;
 }
+/* Bottom fade — content dissolves into nav bar, not hard-clipped */
+.tab::after{
+  content:'';position:absolute;
+  left:0;right:0;bottom:0;
+  height:96px;
+  background:linear-gradient(to bottom,transparent 0%,rgba(4,6,15,.9) 100%);
+  pointer-events:none;z-index:8;
+}
 .tab.hidden{opacity:0;pointer-events:none;transform:translateY(6px)}
 .tab.active{opacity:1;pointer-events:all;transform:translateY(0)}
 
@@ -126,7 +134,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   background:radial-gradient(ellipse at 35% 5%,rgba(90,25,180,.26) 0%,transparent 50%),
              radial-gradient(ellipse at 75% 90%,rgba(8,55,160,.18) 0%,transparent 45%),#04060f;
 }
-.map-nebula{position:absolute;border-radius:50%;filter:blur(70px);opacity:.13;pointer-events:none}
+.map-nebula{position:absolute;border-radius:50%;filter:blur(70px);opacity:.13;pointer-events:none;
+  mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);
+}
 .mn1{width:340px;height:280px;top:-60px;left:-80px;background:rgba(100,30,200,1)}
 .mn2{width:300px;height:300px;bottom:-80px;right:-70px;background:rgba(20,80,200,1)}
 
@@ -164,6 +175,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
   border:1px solid rgba(255,190,30,.22);border-radius:20px;
   padding:7px 12px;font-size:13px;font-weight:700;color:#ffd060;
 }
+/* Header right group */
+.hdr-right{display:flex;align-items:center;gap:8px}
+/* Bell button — universal */
+.bell-btn{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;
+  transition:transform .18s,background .18s;
+}
+.bell-btn:active{transform:scale(.88);background:rgba(255,255,255,.12)}
 
 .daily-banner{
   position:relative;z-index:2;margin:0 18px 12px;padding:14px 16px;
@@ -190,18 +213,20 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .p-orb{position:relative;width:86px;height:86px;flex-shrink:0}
 .p-body{
   width:86px;height:86px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:38px;
+  display:flex;align-items:center;justify-content:center;font-size:0;
   position:relative;overflow:hidden;
   box-shadow:0 10px 40px rgba(0,0,0,.72),0 3px 10px rgba(0,0,0,.5),inset 0 -8px 20px rgba(0,0,0,.45);
   transition:transform .22s ease,box-shadow .22s ease;
 }
-.p-body::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 68% 72%,rgba(0,0,0,.52) 0%,transparent 55%);z-index:1}
-.p-body::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.48) 0%,rgba(255,255,255,.14) 32%,transparent 58%);z-index:2}
+/* Terminator (night-side shadow) */
+.p-body::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 70% 74%,rgba(0,0,0,.65) 0%,rgba(0,0,0,.15) 46%,transparent 65%);z-index:3;pointer-events:none}
+/* Specular highlight */
+.p-body::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 55% 45% at 30% 24%,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 38%,transparent 60%);z-index:4;pointer-events:none}
 .prow.unlocked .p-body:active{transform:scale(.9)}
 .prow.locked .p-body{filter:grayscale(.75) brightness(.4)}
-.p-glow{position:absolute;top:50%;left:50%;width:114px;height:114px;border-radius:50%;transform:translate(-50%,-50%);filter:blur(12px);opacity:0;pointer-events:none}
-.prow.unlocked .p-glow{opacity:.8;animation:pglow 3.5s ease-in-out infinite}
-@keyframes pglow{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.2)}}
+.p-glow{position:absolute;top:50%;left:50%;width:130px;height:130px;border-radius:50%;transform:translate(-50%,-50%);filter:blur(18px);opacity:0;pointer-events:none}
+.prow.unlocked .p-glow{opacity:.9;animation:pglow 3.5s ease-in-out infinite}
+@keyframes pglow{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.22)}}
 .p-ring{position:absolute;top:50%;left:50%;width:124px;height:30px;border:2px solid rgba(255,255,255,.11);border-radius:50%;transform:translate(-50%,-50%) rotateX(74deg);pointer-events:none}
 .p-stars{display:flex;gap:3px;position:absolute;bottom:-18px;left:50%;transform:translateX(-50%)}
 .ps{font-size:13px;filter:grayscale(1) brightness(.4)}
@@ -446,70 +471,184 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .quest-done{font-size:20px;flex-shrink:0}
 
 /* ════════════════════════════════
-   TAB 4 — PROFILE
+   TAB 4 — PROFILE (redesigned)
 ════════════════════════════════ */
 .profile-hero{
   position:relative;z-index:2;
   display:flex;flex-direction:column;align-items:center;
-  padding:52px 20px 18px;
+  padding:36px 20px 16px;overflow:hidden;
 }
-.profile-avatar{
-  width:80px;height:80px;border-radius:50%;
-  background:linear-gradient(135deg,rgba(120,80,255,.5),rgba(60,120,255,.4));
-  border:2px solid rgba(160,130,255,.4);
+.profile-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(90,45,200,.42) 0%,transparent 58%);
+  pointer-events:none;
+}
+.prof-hero-glow{
+  position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,rgba(140,85,255,.65) 0%,rgba(80,120,255,.28) 45%,transparent 70%);
+  filter:blur(26px);pointer-events:none;z-index:0;
+}
+/* top corner buttons */
+.prof-top-btn{
+  position:absolute;top:14px;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
   display:flex;align-items:center;justify-content:center;
-  font-size:36px;margin-bottom:12px;
-  box-shadow:0 0 30px rgba(120,80,255,.25);
+  font-size:16px;cursor:pointer;z-index:5;
+  transition:transform .18s,background .18s;
 }
-.profile-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:3px}
-.profile-level{font-size:12px;color:rgba(255,255,255,.4);background:rgba(120,80,255,.15);border:1px solid rgba(120,80,255,.25);border-radius:10px;padding:3px 10px}
-.xp-bar-wrap{width:100%;margin-top:14px;background:rgba(255,255,255,.07);border-radius:4px;height:6px;overflow:hidden}
-.xp-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#7840ff,#40a0ff);width:62%}
-.xp-label{font-size:10px;color:rgba(255,255,255,.3);margin-top:5px;text-align:center}
+.prof-top-btn:active{transform:scale(.88)}
+.prof-top-btn.left{left:14px}
+.prof-top-btn.right{right:14px}
 
+/* XP ring */
+.prof-ring-wrap{position:relative;width:148px;height:148px;flex-shrink:0;z-index:1}
+.prof-ring-wrap svg{position:absolute;inset:0;width:148px;height:148px}
+.prof-avatar{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:112px;height:112px;border-radius:50%;overflow:hidden;
+  box-shadow:0 0 0 2px rgba(160,185,225,.4),0 0 26px rgba(120,80,255,.45),0 10px 30px rgba(0,0,0,.6);
+  background:#0a0e20;
+}
+.prof-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 15%;display:block}
+.prof-avatar-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px}
+.prof-avatar::after{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 45%);pointer-events:none}
+.prof-lv-pill{
+  position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);z-index:4;
+  display:flex;align-items:center;gap:4px;
+  background:linear-gradient(135deg,rgba(80,40,160,.96),rgba(40,70,160,.96));
+  border:1px solid rgba(120,90,255,.55);border-radius:20px;
+  padding:4px 12px;white-space:nowrap;
+  box-shadow:0 2px 12px rgba(100,60,255,.4);
+}
+.prof-lv-pill span:first-child{font-size:11px;font-weight:800;color:#fff}
+.prof-lv-pill span:last-child{font-size:10px;font-weight:600;color:#c0a0ff}
+
+.profile-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.4px;margin-top:18px;z-index:1}
+.xp-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.35);margin-top:3px;z-index:1}
+.prof-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);margin:13px 0 0}
+
+/* Stats 2×2 */
 .stats-grid{
   position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;
-  gap:8px;margin:0 18px 16px;
+  gap:8px;margin:16px 18px 0;
 }
 .stat-card{
-  padding:14px;background:rgba(255,255,255,.05);backdrop-filter:blur(14px);
-  border:1px solid rgba(255,255,255,.08);border-radius:18px;text-align:center;
-}
-.stat-icon{font-size:22px;margin-bottom:5px}
-.stat-val{font-size:22px;font-weight:800;color:#fff}
-.stat-lbl{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px}
-
-.achievement-row{
-  position:relative;z-index:2;display:flex;gap:8px;
-  padding:0 18px 10px;overflow-x:auto;scrollbar-width:none;
-}
-.achievement-row::-webkit-scrollbar{display:none}
-.ach-item{
-  flex-shrink:0;width:70px;text-align:center;
-  padding:12px 8px;background:rgba(255,255,255,.05);
+  padding:11px 10px;background:rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.08);border-radius:16px;
+  display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;
 }
-.ach-icon{font-size:24px;margin-bottom:4px}
-.ach-name{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;line-height:1.3}
-.ach-item.locked{opacity:.3}
+.stat-glow{position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;filter:blur(12px);opacity:.35}
+.stat-icon{font-size:22px;flex-shrink:0;z-index:1}
+.stat-body{z-index:1}
+.stat-val{font-size:20px;font-weight:800;color:#fff;line-height:1}
+.stat-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,.3);margin-top:2px;letter-spacing:.4px}
 
-.settings-row{position:relative;z-index:2;margin:0 18px}
-.setting-item{
-  display:flex;align-items:center;gap:12px;padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;
+/* Achievements grid */
+.achievement-row{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:7px;padding:0 18px;margin-top:20px;
 }
-.setting-item:last-child{border-bottom:none}
-.setting-icon{font-size:20px;width:32px;text-align:center}
-.setting-label{font-size:14px;color:rgba(255,255,255,.7);flex:1}
-.setting-arrow{font-size:12px;color:rgba(255,255,255,.25)}
+.ach-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 10px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);border-radius:13px;
+}
+.ach-item.unlocked{background:rgba(80,200,100,.06);border-color:rgba(80,200,100,.2)}
+.ach-item.locked{opacity:.42}
+.ach-icon{font-size:19px;flex-shrink:0}
+.ach-body{min-width:0}
+.ach-name{font-size:11px;font-weight:700;color:#fff;line-height:1.25}
+.ach-sub{font-size:9px;margin-top:2px;color:rgba(255,255,255,.28)}
+.ach-item.unlocked .ach-sub{color:#60d080}
+
+/* Profile settings */
+.settings-row{position:relative;z-index:2;margin:20px 18px 0}
+.setting-list{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden}
+.setting-item{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;
+}
+.setting-item:last-child{border:none}
+.setting-icon{font-size:18px;width:28px;text-align:center}
+.setting-label{font-size:13px;color:rgba(255,255,255,.65);flex:1}
+.setting-arrow{font-size:11px;color:rgba(255,255,255,.2)}
+
+/* ════════════════════════════════
+   NOTIFICATIONS OVERLAY
+════════════════════════════════ */
+.notif-overlay{
+  position:absolute;inset:0;z-index:60;
+  background:rgba(4,6,15,.6);backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+.notif-overlay.show{opacity:1;pointer-events:all}
+.notif-sheet{
+  background:linear-gradient(180deg,rgba(18,20,38,.98) 0%,rgba(10,12,26,.99) 100%);
+  border-top:1px solid rgba(255,255,255,.1);
+  border-radius:28px 28px 0 0;
+  padding:0 0 34px;
+  transform:translateY(100%);
+  transition:transform .42s cubic-bezier(.22,1,.36,1);
+  max-height:75%;
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.notif-overlay.show .notif-sheet{transform:translateY(0)}
+.notif-handle{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:12px auto 0;flex-shrink:0}
+.notif-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 10px;flex-shrink:0}
+.notif-title{font-size:16px;font-weight:700;color:#fff}
+.notif-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(255,255,255,.6);cursor:pointer}
+.notif-list{flex:1;overflow-y:auto;padding:0 16px;scrollbar-width:none}
+.notif-list::-webkit-scrollbar{display:none}
+.notif-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.notif-item:last-child{border:none}
+.notif-icon-wrap{
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.notif-body{flex:1;min-width:0}
+.notif-msg{font-size:13px;font-weight:600;color:#fff;line-height:1.4}
+.notif-time{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:#a080ff;flex-shrink:0;margin-top:6px}
+.notif-empty{display:flex;flex-direction:column;align-items:center;padding:32px 0;color:rgba(255,255,255,.3)}
+.notif-empty-icon{font-size:40px;margin-bottom:10px}
+.notif-empty-txt{font-size:13px}
 
 /* ════════════════════════════════
    GAME OVERLAY
 ════════════════════════════════ */
 .game-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:#04060f;background-size:cover;background-position:center bottom}
 .game-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,6,15,.62) 0%,rgba(4,6,15,.28) 40%,rgba(4,6,15,.54) 100%);z-index:1}
-.game-planet-far{position:absolute;z-index:2;top:-40px;right:-50px;width:260px;height:260px;border-radius:50%;opacity:.28;filter:blur(0px);pointer-events:none;box-shadow:inset -20px 20px 40px rgba(0,0,0,.5),inset 8px -8px 20px rgba(255,255,255,.08)}
-.game-planet-far-glow{position:absolute;z-index:2;top:-80px;right:-90px;width:380px;height:380px;border-radius:50%;filter:blur(44px);opacity:.42;pointer-events:none}
+.game-planet-far{
+  position:absolute;z-index:2;top:-48px;right:-56px;
+  width:260px;height:260px;border-radius:50%;
+  opacity:.52;overflow:hidden;pointer-events:none;
+}
+/* Terminator */
+.game-planet-far::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 68% 72%,rgba(0,0,0,.65) 0%,rgba(0,0,0,.18) 48%,transparent 68%);
+  z-index:2;pointer-events:none;
+}
+/* Specular highlight */
+.game-planet-far::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse 50% 42% at 30% 26%,rgba(255,255,255,.38) 0%,rgba(255,255,255,.08) 38%,transparent 60%);
+  z-index:3;pointer-events:none;
+}
+.game-planet-far-glow{
+  position:absolute;z-index:1;top:-90px;right:-100px;
+  width:420px;height:420px;border-radius:50%;
+  filter:blur(52px);opacity:.55;pointer-events:none;
+}
 .game-planet-tint-top{position:absolute;z-index:2;top:0;right:0;width:100%;height:45%;pointer-events:none}
 .planet-sphere{position:absolute;border-radius:50%;bottom:-78%;left:50%;transform:translateX(-50%);opacity:.34;filter:blur(0px);z-index:2;pointer-events:none}
 .planet-sphere::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 35%,transparent 55%),radial-gradient(circle at 68% 72%,rgba(0,0,0,.55) 0%,transparent 50%)}
@@ -538,7 +677,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .constellation{position:relative;z-index:3;flex:1;display:flex;justify-content:center;align-items:center;padding:6px 16px 0;overflow:hidden;min-height:0;transition:padding .2s ease}
 .constellation.has-timer{padding:2px 16px 0}
 .cw-canvas{position:relative;transform-origin:center;transition:transform .2s ease}
-.cw-slot{position:absolute;width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;background:rgba(255,255,255,.04);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:transparent;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.cw-slot{position:absolute;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;background:rgba(255,255,255,.04);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:transparent;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
 .cw-slot.revealed{color:#fff;animation:slotIn .42s cubic-bezier(.34,1.56,.64,1) both}
 .cw-slot.revealed.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.25),rgba(160,70,15,.12));border-color:rgba(230,150,70,.42);text-shadow:0 0 14px rgba(255,160,60,.95),0 0 30px rgba(220,100,20,.5);box-shadow:0 0 18px rgba(210,110,30,.22),inset 0 1px 0 rgba(255,200,120,.18)}
 .cw-slot.revealed.t-venus{background:linear-gradient(145deg,rgba(210,170,30,.25),rgba(170,130,10,.12));border-color:rgba(240,210,80,.42);text-shadow:0 0 14px rgba(255,220,80,.95);box-shadow:0 0 18px rgba(210,170,30,.22),inset 0 1px 0 rgba(255,240,160,.18)}
@@ -563,20 +702,20 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 @keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
 /* Orb */
-.orb-wrap{position:relative;z-index:3;display:flex;justify-content:center;align-items:center;padding:2px 0 8px}
-.orb{position:relative;width:232px;height:232px;touch-action:none;user-select:none}
-.orb-ring{position:absolute;inset:-9px;border-radius:50%;animation:orbSpin 10s linear infinite;filter:blur(5px);opacity:.5;transition:background 1s ease,opacity .3s}
+.orb-wrap{position:relative;z-index:3;display:flex;justify-content:center;align-items:center;padding:2px 0 6px}
+.orb{position:relative;width:208px;height:208px;touch-action:none;user-select:none}
+.orb-ring{position:absolute;inset:-8px;border-radius:50%;animation:orbSpin 10s linear infinite;filter:blur(5px);opacity:.5;transition:background 1s ease,opacity .3s}
 .orb.active .orb-ring{opacity:.9}
 @keyframes orbSpin{to{transform:rotate(360deg)}}
 .orb-dome{position:absolute;inset:0;border-radius:50%;backdrop-filter:blur(32px) saturate(1.4);background:radial-gradient(circle at 33% 28%,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 40%,rgba(0,0,0,.06) 100%);border:1px solid rgba(255,255,255,.17);box-shadow:0 8px 40px rgba(0,0,0,.35),inset 0 1.5px 0 rgba(255,255,255,.25),inset 0 -1px 0 rgba(0,0,0,.15)}
 .orb-dome::before{content:'';position:absolute;top:8%;left:16%;width:36%;height:20%;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 60%,transparent);filter:blur(2px)}
 .orb-dome::after{content:'';position:absolute;bottom:10%;left:25%;width:50%;height:8%;border-radius:50%;background:linear-gradient(to top,rgba(255,255,255,.07),transparent);filter:blur(3px)}
-.orb-iglow{position:absolute;top:50%;left:50%;width:90px;height:90px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);transition:all .4s ease;pointer-events:none}
-.orb.active .orb-iglow{width:150px;height:150px}
+.orb-iglow{position:absolute;top:50%;left:50%;width:81px;height:81px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);transition:all .4s ease;pointer-events:none}
+.orb.active .orb-iglow{width:135px;height:135px}
 .orb-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible}
 .ln-solid{stroke-width:2.5;stroke-linecap:round;fill:none}
 .ln-dash{stroke-width:1.5;stroke-linecap:round;fill:none;stroke-dasharray:5 5}
-.lnode{position:absolute;width:50px;height:50px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;z-index:3;cursor:pointer;background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.88);box-shadow:0 4px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.17);transition:all .15s cubic-bezier(.34,1.56,.64,1)}
+.lnode{position:absolute;width:46px;height:46px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;z-index:3;cursor:pointer;background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.88);box-shadow:0 4px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.17);transition:all .15s cubic-bezier(.34,1.56,.64,1)}
 .lnode.sel{border-color:rgba(200,160,255,.7);color:#fff;transform:translate(-50%,-50%) scale(1.17)}
 .lnode.sel.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.45),rgba(160,70,15,.3));box-shadow:0 0 22px rgba(210,110,30,.65),inset 0 1px 0 rgba(255,200,120,.25);text-shadow:0 0 12px rgba(255,170,70,1)}
 .lnode.sel.t-venus{background:linear-gradient(145deg,rgba(210,170,30,.45),rgba(170,130,10,.3));box-shadow:0 0 22px rgba(210,170,30,.65),inset 0 1px 0 rgba(255,240,140,.25);text-shadow:0 0 12px rgba(255,230,70,1)}
@@ -610,25 +749,40 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .ch-card-reward{font-size:11px;font-weight:700;color:#ffd060;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modal-normal-btn{width:100%;padding:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;font-size:14px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;margin-top:4px}
 
-/* Win */
-.win-ov{display:none;position:fixed;inset:0;z-index:80;justify-content:center;align-items:center;flex-direction:column;gap:18px;background:rgba(4,6,15,.75);backdrop-filter:blur(28px)}
-.win-ov.show{display:flex;animation:fIn .45s ease}
-@keyframes fIn{from{opacity:0}to{opacity:1}}
-.win-card{background:rgba(255,255,255,.05);backdrop-filter:blur(40px);border:1px solid rgba(255,255,255,.13);border-radius:30px;padding:32px 44px;text-align:center;max-width:310px;width:90%}
-.wc-planet{font-size:58px;display:block;margin-bottom:12px;animation:fl 2.5s ease-in-out infinite}
-@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.wc-stars{display:flex;justify-content:center;gap:7px;margin-bottom:12px}
-.wst{font-size:32px;filter:grayscale(1) brightness(.4);transition:all .35s ease}
+/* Win — iOS bottom sheet */
+.win-ov{display:none;position:fixed;inset:0;z-index:80;flex-direction:column;justify-content:flex-end;background:rgba(4,6,15,.72);backdrop-filter:blur(20px)}
+.win-ov.show{display:flex}
+.win-ov.show .win-sheet{animation:sheetUp .46s cubic-bezier(.22,1,.36,1) both}
+@keyframes sheetUp{from{transform:translateY(100%);opacity:.6}to{transform:translateY(0);opacity:1}}
+.win-sheet{
+  background:linear-gradient(180deg,rgba(22,24,40,.98) 0%,rgba(14,16,30,.99) 100%);
+  border-top:1px solid rgba(255,255,255,.12);
+  border-radius:28px 28px 0 0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 -8px 48px rgba(0,0,0,.5);
+}
+.win-handle{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:12px auto 0;flex-shrink:0}
+.win-content{flex:1;display:flex;flex-direction:column;align-items:center;padding:18px 24px 20px;gap:12px;overflow-y:auto;scrollbar-width:none}
+.win-content::-webkit-scrollbar{display:none}
+.wc-planet{font-size:60px;display:block;animation:fl 2.5s ease-in-out infinite;line-height:1}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.wc-stars{display:flex;justify-content:center;gap:8px}
+.wst{font-size:30px;filter:grayscale(1) brightness(.4);transition:all .35s ease}
 .wst.on{filter:none;text-shadow:0 0 22px rgba(255,200,50,1)}
-.wc-title{font-size:24px;font-weight:800;background:linear-gradient(135deg,#fff 0%,#c0a0ff 50%,#60d0ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.wc-sub{font-size:13px;color:rgba(255,255,255,.4)}
-.win-rewards{display:flex;gap:8px;margin-top:14px;justify-content:center}
-.wr-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px}
+.wc-title{font-size:22px;font-weight:800;background:linear-gradient(135deg,#fff 0%,#c0a0ff 50%,#60d0ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+.wc-sub{font-size:12px;color:rgba(255,255,255,.38);text-align:center}
+.win-rewards{display:flex;gap:8px;width:100%}
+.wr-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px}
 .wr-icon{font-size:20px}
-.wr-val{font-size:14px;font-weight:700;color:#fff}
-.wr-lbl{font-size:10px;color:rgba(255,255,255,.35)}
-.next-btn{background:linear-gradient(135deg,#7838ff 0%,#3878ff 100%);border:none;border-radius:20px;padding:14px 50px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 0 36px rgba(100,60,255,.4);transition:transform .2s}
-.next-btn:active{transform:scale(.95)}
+.wr-val{font-size:15px;font-weight:700;color:#fff}
+.wr-lbl{font-size:10px;color:rgba(255,255,255,.32);letter-spacing:.3px}
+/* Divider */
+.win-divider{width:100%;height:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+/* Bottom button row — always pinned */
+.win-btn-row{padding:14px 20px 36px;flex-shrink:0}
+.next-btn{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#7838ff 0%,#3878ff 100%);border:none;border-radius:18px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.3px;box-shadow:0 0 32px rgba(100,60,255,.4),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .15s ease,box-shadow .15s ease}
+.next-btn:active{transform:scale(.97);box-shadow:0 0 14px rgba(100,60,255,.3)}
 </style>
 </head>
 <body>
@@ -647,7 +801,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
       <div class="map-header">
         <div class="map-logo">✦ Stellar Words</div>
-        <div class="map-coins">🪙 <span id="mapCoins">120</span></div>
+        <div class="hdr-right">
+          <div class="map-coins">🪙 <span id="mapCoins">120</span></div>
+          <div class="bell-btn" onclick="toggleNotifications()">🔔</div>
+        </div>
       </div>
 
       <div class="daily-banner" onclick="switchTab('tabDaily')">
@@ -664,8 +821,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
           <div class="prow unlocked" onclick="openLevel(0)">
             <div class="p-orb">
-              <div class="p-glow" style="background:rgba(210,120,45,1)"></div>
-              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#d49068,#7a3a18)">🪨</div>
+              <div class="p-glow" style="background:radial-gradient(circle,rgba(220,130,50,1) 0%,rgba(180,80,20,.4) 60%,transparent 80%)"></div>
+              <div class="p-body" style="background:radial-gradient(ellipse at 55% 44%,rgba(90,40,10,.5) 0%,transparent 38%),radial-gradient(ellipse at 32% 62%,rgba(60,25,8,.4) 0%,transparent 30%),radial-gradient(circle at 38% 34%,#d09060,#8c4822,#3e1408)"></div>
               <div class="p-stars"><span class="ps on">⭐</span><span class="ps on">⭐</span><span class="ps">⭐</span></div>
             </div>
             <div class="p-card">
@@ -681,8 +838,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
           <div class="prow unlocked" onclick="openLevel(1)">
             <div class="p-orb">
-              <div class="p-glow" style="background:rgba(220,170,45,1)"></div>
-              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#f0c058,#a05f1e)">🌕</div>
+              <div class="p-glow" style="background:radial-gradient(circle,rgba(240,190,50,1) 0%,rgba(200,140,20,.4) 60%,transparent 80%)"></div>
+              <div class="p-body" style="background:radial-gradient(ellipse at 48% 68%,rgba(180,110,10,.35) 0%,transparent 45%),radial-gradient(ellipse at 28% 36%,rgba(255,240,160,.2) 0%,transparent 32%),radial-gradient(circle at 38% 32%,#f4d468,#c08028,#6a3e10)"></div>
               <div class="p-stars"><span class="ps on">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
             </div>
             <div class="p-card">
@@ -698,8 +855,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
           <div class="prow unlocked" onclick="openLevel(2)">
             <div class="p-orb">
-              <div class="p-glow" style="background:rgba(38,125,215,1)"></div>
-              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#50b0f0,#0e52a8)">🌍</div>
+              <div class="p-glow" style="background:radial-gradient(circle,rgba(60,160,255,1) 0%,rgba(20,90,210,.4) 60%,transparent 80%)"></div>
+              <div class="p-body" style="background:radial-gradient(ellipse at 44% 66%,rgba(20,110,30,.55) 0%,transparent 38%),radial-gradient(ellipse at 22% 38%,rgba(30,100,30,.45) 0%,transparent 24%),radial-gradient(circle at 38% 32%,#62c0f8,#1262c0,#062e80)"></div>
               <div class="p-ring"></div>
               <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
             </div>
@@ -716,7 +873,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
           <div class="prow locked">
             <div class="p-orb">
-              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#c85848,#6a1610)">🔴</div>
+              <div class="p-body" style="background:radial-gradient(ellipse at 42% 72%,rgba(110,18,8,.5) 0%,transparent 38%),radial-gradient(ellipse at 26% 44%,rgba(180,60,20,.3) 0%,transparent 28%),radial-gradient(circle at 38% 32%,#d45030,#8e1e10,#440808)"></div>
               <div class="lock-ic">🔒</div>
               <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
             </div>
@@ -729,7 +886,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
           <div class="prow locked">
             <div class="p-orb">
-              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#d08858,#784020)">🟠</div>
+              <div class="p-body" style="background:repeating-linear-gradient(to bottom,rgba(180,100,30,.22) 0px,rgba(180,100,30,.22) 7px,rgba(100,50,10,.12) 7px,rgba(100,50,10,.12) 13px),radial-gradient(ellipse at 38% 56%,rgba(200,80,20,.3) 0%,transparent 40%),radial-gradient(circle at 38% 32%,#e0a860,#b06830,#6a3010)"></div>
               <div class="lock-ic">🔒</div>
               <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
             </div>
@@ -742,7 +899,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
           <div class="prow locked">
             <div class="p-orb">
-              <div class="p-body" style="background:radial-gradient(circle at 38% 32%,#e0c078,#887028)">🪐</div>
+              <div class="p-body" style="background:repeating-linear-gradient(to bottom,rgba(220,190,90,.2) 0px,rgba(220,190,90,.2) 5px,rgba(140,110,20,.1) 5px,rgba(140,110,20,.1) 9px),radial-gradient(ellipse at 48% 60%,rgba(180,130,20,.28) 0%,transparent 40%),radial-gradient(circle at 38% 32%,#eed070,#a88830,#5c5010)"></div>
               <div class="p-ring"></div>
               <div class="lock-ic">🔒</div>
               <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
@@ -764,7 +921,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 
       <div class="tab-header">
         <div class="tab-title">Daily</div>
-        <div class="tab-coins">🪙 <span id="dailyCoins">120</span></div>
+        <div class="hdr-right">
+          <div class="tab-coins">🪙 <span id="dailyCoins">120</span></div>
+          <div class="bell-btn" onclick="toggleNotifications()">🔔</div>
+        </div>
       </div>
 
       <div class="tab-scroll">
@@ -896,7 +1056,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
       <div class="space-bg-grad"></div>
       <div class="tab-header">
         <div class="tab-title">Quests</div>
-        <div class="tab-coins">🪙 120</div>
+        <div class="hdr-right">
+          <div class="tab-coins">🪙 120</div>
+          <div class="bell-btn" onclick="toggleNotifications()">🔔</div>
+        </div>
       </div>
       <div class="tab-scroll">
         <div class="quest-section">
@@ -967,38 +1130,88 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
     <div class="tab hidden" id="tabProfile">
       <div class="space-bg-grad"></div>
       <div class="tab-scroll">
+
+        <!-- Hero -->
         <div class="profile-hero">
-          <div class="profile-avatar">🧑‍🚀</div>
+          <div class="prof-hero-glow"></div>
+          <div class="prof-top-btn left" onclick="editName()">✏️</div>
+          <div class="prof-top-btn right" onclick="toggleNotifications()">🔔</div>
+
+          <div class="prof-ring-wrap">
+            <svg width="148" height="148" viewBox="0 0 148 148" fill="none">
+              <circle cx="74" cy="74" r="69" stroke="rgba(255,255,255,0.07)" stroke-width="5"/>
+              <circle cx="74" cy="74" r="69" stroke="url(#xpRing)" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="269 434" stroke-dashoffset="109"
+                transform="rotate(-90 74 74)"/>
+              <defs>
+                <linearGradient id="xpRing" x1="0" y1="0" x2="148" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#7840ff"/>
+                  <stop offset="100%" stop-color="#40c0ff"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="prof-avatar">
+              <div class="prof-avatar-emoji">🧑‍🚀</div>
+            </div>
+            <div class="prof-lv-pill">
+              <span>Lv.4</span>
+              <span>· Stargazer 🌟</span>
+            </div>
+          </div>
+
           <div class="profile-name">Sandora</div>
-          <div class="profile-level">Level 4 · Stargazer</div>
-          <div class="xp-bar-wrap"><div class="xp-bar"></div></div>
-          <div class="xp-label">620 / 1000 XP to Level 5</div>
+          <div class="xp-label">620 / 1000 XP</div>
         </div>
 
+        <div class="prof-divider"></div>
+
+        <!-- Stats 2×2 -->
         <div class="stats-grid">
-          <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-val">247</div><div class="stat-lbl">Words Found</div></div>
-          <div class="stat-card"><div class="stat-icon">🪐</div><div class="stat-val">2</div><div class="stat-lbl">Planets Cleared</div></div>
-          <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val">3</div><div class="stat-lbl">Best Streak</div></div>
-          <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-val">5</div><div class="stat-lbl">Stars Earned</div></div>
+          <div class="stat-card">
+            <div class="stat-glow" style="background:#ff9040"></div>
+            <div class="stat-icon">📝</div>
+            <div class="stat-body"><div class="stat-val">247</div><div class="stat-lbl">WORDS</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-glow" style="background:#a060ff"></div>
+            <div class="stat-icon">🪐</div>
+            <div class="stat-body"><div class="stat-val">2</div><div class="stat-lbl">PLANETS</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-glow" style="background:#ff5020"></div>
+            <div class="stat-icon">🔥</div>
+            <div class="stat-body"><div class="stat-val">3</div><div class="stat-lbl">STREAK</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-glow" style="background:#ffd040"></div>
+            <div class="stat-icon">⭐</div>
+            <div class="stat-body"><div class="stat-val">5</div><div class="stat-lbl">STARS</div></div>
+          </div>
         </div>
 
-        <div class="section-title">ACHIEVEMENTS</div>
+        <!-- Achievements -->
+        <div class="section-title" style="padding:20px 18px 0;position:relative;z-index:2;display:flex;justify-content:space-between">
+          <span>ACHIEVEMENTS</span><span style="color:#a080ff;font-size:10px;font-weight:700">3 / 12</span>
+        </div>
         <div class="achievement-row">
-          <div class="ach-item"><div class="ach-icon">🚀</div><div class="ach-name">First Launch</div></div>
-          <div class="ach-item"><div class="ach-icon">🪨</div><div class="ach-name">Mercury Done</div></div>
-          <div class="ach-item"><div class="ach-icon">🔥</div><div class="ach-name">3-Day Streak</div></div>
-          <div class="ach-item locked"><div class="ach-icon">🌍</div><div class="ach-name">Earth Master</div></div>
-          <div class="ach-item locked"><div class="ach-icon">💎</div><div class="ach-name">Gem Hunter</div></div>
-          <div class="ach-item locked"><div class="ach-icon">🏆</div><div class="ach-name">Champion</div></div>
+          <div class="ach-item unlocked"><div class="ach-icon">🚀</div><div class="ach-body"><div class="ach-name">First Launch</div><div class="ach-sub">Unlocked</div></div></div>
+          <div class="ach-item unlocked"><div class="ach-icon">🔥</div><div class="ach-body"><div class="ach-name">3-Day Streak</div><div class="ach-sub">Unlocked</div></div></div>
+          <div class="ach-item unlocked"><div class="ach-icon">🪨</div><div class="ach-body"><div class="ach-name">Mercury Done</div><div class="ach-sub">Unlocked</div></div></div>
+          <div class="ach-item locked"><div class="ach-icon">🌍</div><div class="ach-body"><div class="ach-name">Earth Master</div><div class="ach-sub">0 / 3 ★</div></div></div>
+          <div class="ach-item locked"><div class="ach-icon">💎</div><div class="ach-body"><div class="ach-name">Gem Hunter</div><div class="ach-sub">0 / 5</div></div></div>
+          <div class="ach-item locked"><div class="ach-icon">🏆</div><div class="ach-body"><div class="ach-name">Champion</div><div class="ach-sub">Locked</div></div></div>
         </div>
 
-        <div class="section-title" style="margin-top:8px">SETTINGS</div>
+        <!-- Settings -->
         <div class="settings-row">
-          <div class="setting-item"><div class="setting-icon">🔔</div><div class="setting-label">Notifications</div><div class="setting-arrow">›</div></div>
-          <div class="setting-item"><div class="setting-icon">🔊</div><div class="setting-label">Sound & Haptics</div><div class="setting-arrow">›</div></div>
-          <div class="setting-item"><div class="setting-icon">🌙</div><div class="setting-label">Appearance</div><div class="setting-arrow">›</div></div>
-          <div class="setting-item"><div class="setting-icon">❓</div><div class="setting-label">Help & Support</div><div class="setting-arrow">›</div></div>
+          <div class="section-title" style="margin-bottom:9px">SETTINGS</div>
+          <div class="setting-list">
+            <div class="setting-item"><div class="setting-icon">🔊</div><div class="setting-label">Sound & Haptics</div><div class="setting-arrow">›</div></div>
+            <div class="setting-item"><div class="setting-icon">🌙</div><div class="setting-label">Appearance</div><div class="setting-arrow">›</div></div>
+            <div class="setting-item"><div class="setting-icon">❓</div><div class="setting-label">Help & Support</div><div class="setting-arrow">›</div></div>
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -1062,7 +1275,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
         <div class="orb-ring" id="orbRing"></div>
         <div class="orb-dome"></div>
         <div class="orb-iglow"></div>
-        <svg class="orb-svg" id="orbSvg" viewBox="0 0 232 232" overflow="visible"></svg>
+        <svg class="orb-svg" id="orbSvg" viewBox="0 0 208 208" overflow="visible"></svg>
       </div>
     </div>
     <div class="game-actions">
@@ -1107,22 +1320,71 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
     </div>
   </div>
 
+  <!-- NOTIFICATIONS OVERLAY -->
+  <div class="notif-overlay" id="notifOverlay" onclick="closeNotifOutside(event)">
+    <div class="notif-sheet" id="notifSheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">Notifications</div>
+        <div class="notif-close" onclick="toggleNotifications()">✕</div>
+      </div>
+      <div class="notif-list">
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:rgba(255,140,30,.12);border:1px solid rgba(255,140,30,.2)">🔥</div>
+          <div class="notif-body">
+            <div class="notif-msg">3-day streak! Keep it up to unlock Day 7 reward</div>
+            <div class="notif-time">Just now</div>
+          </div>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:rgba(60,120,255,.12);border:1px solid rgba(60,120,255,.2)">🌍</div>
+          <div class="notif-body">
+            <div class="notif-msg">Daily Challenge resets in <span id="notifTimer">--:--:--</span></div>
+            <div class="notif-time">Today</div>
+          </div>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:rgba(255,200,30,.1);border:1px solid rgba(255,200,30,.18)">⭐</div>
+          <div class="notif-body">
+            <div class="notif-msg">You earned 5 stars — almost at Earth Master!</div>
+            <div class="notif-time">Yesterday</div>
+          </div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon-wrap" style="background:rgba(120,80,255,.12);border:1px solid rgba(120,80,255,.2)">🪙</div>
+          <div class="notif-body">
+            <div class="notif-msg">You have 120 coins — try the Hint power-up!</div>
+            <div class="notif-time">2 days ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /phone -->
 
 <!-- WIN -->
 <div class="win-ov" id="winOv">
-  <div class="win-card">
-    <span class="wc-planet" id="wcPlanet">🌍</span>
-    <div class="wc-stars"><span class="wst" id="ws0">⭐</span><span class="wst" id="ws1">⭐</span><span class="wst" id="ws2">⭐</span></div>
-    <div class="wc-title" id="wcTitle">Earth Cleared!</div>
-    <div class="wc-sub" id="wcSub">All words discovered</div>
-    <div class="win-rewards">
-      <div class="wr-item"><div class="wr-icon">⚡</div><div class="wr-val" id="wrXp">+75</div><div class="wr-lbl">XP</div></div>
-      <div class="wr-item"><div class="wr-icon">🪙</div><div class="wr-val" id="wrCoins">+50</div><div class="wr-lbl">Coins</div></div>
-      <div class="wr-item"><div class="wr-icon">⭐</div><div class="wr-val" id="wrStars">2/3</div><div class="wr-lbl">Stars</div></div>
+  <div class="win-sheet">
+    <div class="win-handle"></div>
+    <div class="win-content">
+      <span class="wc-planet" id="wcPlanet">🌍</span>
+      <div class="wc-stars"><span class="wst" id="ws0">⭐</span><span class="wst" id="ws1">⭐</span><span class="wst" id="ws2">⭐</span></div>
+      <div class="wc-title" id="wcTitle">Earth Cleared!</div>
+      <div class="wc-sub" id="wcSub">All words discovered</div>
+      <div class="win-rewards">
+        <div class="wr-item"><div class="wr-icon">⚡</div><div class="wr-val" id="wrXp">+75</div><div class="wr-lbl">XP</div></div>
+        <div class="wr-item"><div class="wr-icon">🪙</div><div class="wr-val" id="wrCoins">+50</div><div class="wr-lbl">Coins</div></div>
+        <div class="wr-item"><div class="wr-icon">⭐</div><div class="wr-val" id="wrStars">2/3</div><div class="wr-lbl">Stars</div></div>
+      </div>
+    </div>
+    <div class="win-divider"></div>
+    <div class="win-btn-row">
+      <button class="next-btn" onclick="nextLevel()">Continue →</button>
     </div>
   </div>
-  <button class="next-btn" onclick="nextLevel()">NEXT PLANET →</button>
 </div>
 
 <script>
@@ -1149,7 +1411,7 @@ function switchTab(tabId){
 }
 
 /* ── LEVELS ── */
-const SLOT=44,GAP=5,STEP=SLOT+GAP;
+const SLOT=48,GAP=6,STEP=SLOT+GAP;
 const LEVELS=[
   {planet:'🪨',name:'Mercury',theme:'mercury',
    bgImage:'https://d8j0ntlcm91z4.cloudfront.net/user_3EPEtaIiNqOfWU9GROOpSEr7he5/hf_20260529_163313_facffc51-9f1d-460d-9c48-5b273eea729b_min.webp',
@@ -1183,13 +1445,54 @@ const LEVELS=[
    placements:[{word:'SNIPE',dir:'H',row:0,col:0},{word:'SPIN',dir:'H',row:2,col:0},{word:'SIN',dir:'V',row:2,col:0},{word:'PIN',dir:'V',row:2,col:1},{word:'PINE',dir:'V',row:1,col:2}]}
 ];
 
+/* ── DAILY PUZZLES (7 unique, cycle by day-of-year) ── */
+const DAILY_PUZZLES=[
+  {_base:2,letters:['T','R','A','C','E'],
+   words:['TRACE','RACE','CARE','CART','TEAR','CRATE','RATE','ACRE'],
+   required:['TRACE','RACE','CARE','CART','TEAR'],
+   placements:[{word:'TRACE',dir:'H',row:0,col:0},{word:'TEAR',dir:'V',row:0,col:0},{word:'CARE',dir:'H',row:1,col:1},{word:'CART',dir:'H',row:2,col:1},{word:'RACE',dir:'H',row:3,col:0}]},
+  {_base:1,letters:['S','H','I','N','E'],
+   words:['SHINE','SHIN','SINE','HENS','SIN','HIES','NESH'],
+   required:['SHINE','SHIN','SINE','HENS','SIN'],
+   placements:[{word:'SHINE',dir:'H',row:0,col:0},{word:'SIN',dir:'H',row:1,col:1},{word:'SHIN',dir:'H',row:2,col:0},{word:'SINE',dir:'H',row:3,col:0},{word:'HENS',dir:'H',row:4,col:0}]},
+  {_base:0,letters:['F','L','A','R','E'],
+   words:['FLARE','FARE','EARL','LEAF','FLEA','REAL','ARLE','ALEF'],
+   required:['FLARE','FARE','EARL','LEAF','FLEA'],
+   placements:[{word:'FLARE',dir:'H',row:0,col:0},{word:'LEAF',dir:'H',row:1,col:1},{word:'FARE',dir:'H',row:2,col:0},{word:'FLEA',dir:'H',row:3,col:0},{word:'EARL',dir:'H',row:4,col:0}]},
+  {_base:2,letters:['S','T','O','R','M'],
+   words:['STORM','SORT','MOST','ROTS','TORS','MORT','MOTS'],
+   required:['STORM','SORT','MOST','ROTS','TORS'],
+   placements:[{word:'STORM',dir:'H',row:0,col:0},{word:'ROTS',dir:'V',row:1,col:0},{word:'SORT',dir:'H',row:2,col:1},{word:'TORS',dir:'H',row:3,col:1},{word:'MOST',dir:'H',row:4,col:1}]},
+  {_base:2,letters:['B','R','I','N','G'],
+   words:['BRING','RING','GRIN','BRIG','GIN','BIN','RIG','BIG'],
+   required:['BRING','RING','GRIN','BRIG','GIN'],
+   placements:[{word:'BRING',dir:'H',row:0,col:0},{word:'GIN',dir:'H',row:1,col:1},{word:'RING',dir:'H',row:2,col:0},{word:'BRIG',dir:'H',row:3,col:0},{word:'GRIN',dir:'H',row:4,col:0}]},
+  {_base:1,letters:['B','L','A','Z','E'],
+   words:['BLAZE','LAZE','ABLE','ZEAL','BALE','BEAL','ALBE'],
+   required:['BLAZE','LAZE','ABLE','ZEAL','BALE'],
+   placements:[{word:'BLAZE',dir:'H',row:0,col:0},{word:'LAZE',dir:'H',row:1,col:1},{word:'ABLE',dir:'H',row:2,col:0},{word:'ZEAL',dir:'H',row:3,col:0},{word:'BALE',dir:'H',row:4,col:0}]},
+  {_base:0,letters:['N','I','G','H','T'],
+   words:['NIGHT','NIGH','THIN','TING','HINT','TWIG','TING','GRIT'],
+   required:['NIGHT','NIGH','THIN','TING','HINT'],
+   placements:[{word:'NIGHT',dir:'H',row:0,col:0},{word:'THIN',dir:'V',row:0,col:4},{word:'NIGH',dir:'H',row:2,col:0},{word:'TING',dir:'H',row:3,col:0},{word:'HINT',dir:'H',row:4,col:0}]}
+];
+function getDailyPuzzle(){
+  const d=new Date(),start=new Date(d.getFullYear(),0,0);
+  const day=Math.floor((d-start)/86400000);
+  const dp=DAILY_PUZZLES[day%DAILY_PUZZLES.length];
+  const base=LEVELS[dp._base];
+  return Object.assign({},base,{letters:dp.letters,words:dp.words,required:dp.required,placements:dp.placements,name:'Daily Challenge'});
+}
+
 let lvlIdx=2,lvl=LEVELS[2],found=new Set(),sel=[],dragging=false,lpos=[];
 let challengeMode=null,timerInterval=null,timeLeft=60;
 
 /* ── GAME NAVIGATION ── */
 function openLevel(i,mode){
   if(i>2)return;
-  lvlIdx=i;lvl=LEVELS[i];found=new Set();sel=[];challengeMode=null;stopTimer();
+  lvlIdx=i;
+  lvl=(mode==='daily')?getDailyPuzzle():LEVELS[i];
+  found=new Set();sel=[];challengeMode=null;stopTimer();
   applyTheme();
   document.getElementById('gnPlanet').textContent=lvl.planet+' '+lvl.name;
   document.getElementById('gnSub').textContent=`Find all ${lvl.required.length} words`;
@@ -1198,10 +1501,30 @@ function openLevel(i,mode){
   document.getElementById('challengeBar').style.display='none';
   buildCrossword();buildOrb();resetSel();
 
-  if(mode==='daily'){challengeMode='daily';document.getElementById('gnSub').textContent='Daily Challenge · 7 words';}
+  if(mode==='daily'){challengeMode='daily';document.getElementById('gnSub').textContent=`Daily Challenge · ${lvl.required.length} words`;}
   else{document.getElementById('challengeModal').classList.add('show');document.getElementById('modalTitle').textContent=lvl.planet+' '+lvl.name+' — Choose Mode';}
   document.getElementById('gameScreen').className='overlay off-r';
   document.querySelector('.nav-bar').classList.add('nav-hidden');
+}
+
+/* ── NOTIFICATIONS ── */
+function toggleNotifications(){
+  const ov=document.getElementById('notifOverlay');
+  ov.classList.toggle('show');
+  // sync timer
+  const el=document.getElementById('notifTimer');
+  if(el)el.textContent=getCountdown();
+}
+function closeNotifOutside(e){
+  if(e.target===document.getElementById('notifOverlay'))toggleNotifications();
+}
+
+/* ── EDIT NAME ── */
+function editName(){
+  const cur=document.querySelector('.profile-name');
+  if(!cur)return;
+  const name=prompt('Enter your name:',cur.textContent);
+  if(name&&name.trim())cur.textContent=name.trim();
 }
 
 function goBack(){
@@ -1272,10 +1595,16 @@ function buildCrossword(){
   updateCrosswordScale();
 }
 function updateCrosswordScale(){
-  const canvas=document.getElementById('cwCanvas');const challengeBar=document.getElementById('challengeBar');
-  if(!canvas)return;
-  const barVisible=challengeBar&&challengeBar.style.display!=='none';
-  canvas.style.transform=barVisible?'scale(0.85)':'scale(1)';
+  const canvas=document.getElementById('cwCanvas');const container=document.getElementById('constellation');
+  if(!canvas||!container)return;
+  const cw=parseFloat(canvas.style.width)||0,ch=parseFloat(canvas.style.height)||0;
+  if(!cw||!ch)return;
+  requestAnimationFrame(()=>{
+    const rect=container.getBoundingClientRect();
+    const availW=Math.max(rect.width-32,80),availH=Math.max(rect.height-16,80);
+    const scale=Math.min(availW/cw,availH/ch,1.0);
+    canvas.style.transform=`scale(${scale})`;
+  });
 }
 function revealWord(word){
   let minR=99,minC=99;lvl.placements.forEach(p=>{minR=Math.min(minR,p.row);minC=Math.min(minC,p.col);});
@@ -1286,10 +1615,10 @@ function revealWord(word){
 /* ── ORB ── */
 function buildOrb(){
   document.getElementById('orb').querySelectorAll('.lnode').forEach(n=>n.remove());lpos=[];
-  const cx=116,cy=116,r=80;
+  const cx=104,cy=104,r=72;
   lvl.letters.forEach((letter,i)=>{const a=(i/lvl.letters.length)*Math.PI*2-Math.PI/2,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);lpos.push({x,y,letter,index:i});const node=document.createElement('div');node.className='lnode';node.id=`ln-${i}`;node.textContent=letter;node.style.left=x+'px';node.style.top=y+'px';document.getElementById('orb').appendChild(node);});
 }
-function getNodeAt(cx,cy){const rect=document.getElementById('orb').getBoundingClientRect(),px=cx-rect.left,py=cy-rect.top;return lpos.find(p=>{const dx=px-p.x,dy=py-p.y;return dx*dx+dy*dy<32*32;})||null;}
+function getNodeAt(cx,cy){const rect=document.getElementById('orb').getBoundingClientRect(),px=cx-rect.left,py=cy-rect.top;return lpos.find(p=>{const dx=px-p.x,dy=py-p.y;return dx*dx+dy*dy<28*28;})||null;}
 function updateSvg(curX,curY){
   const svg=document.getElementById('orbSvg');svg.innerHTML='';
   const cols={mercury:'rgba(220,140,60,.85)',venus:'rgba(230,200,60,.85)',earth:'rgba(80,160,255,.85)',mars:'rgba(230,80,40,.85)'};
