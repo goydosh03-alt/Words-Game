@@ -189,12 +189,21 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .bell-btn:active{transform:scale(.88);background:rgba(255,255,255,.12)}
 
 .daily-banner{
-  position:relative;z-index:2;margin:0 18px 12px;padding:14px 16px;
+  position:relative;z-index:6;margin:0 18px 12px;padding:14px 16px;
   background:linear-gradient(135deg,rgba(120,60,255,.2),rgba(60,120,255,.14));
   backdrop-filter:blur(16px);border:1px solid rgba(140,100,255,.28);border-radius:18px;
   display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .2s;
+  overflow:visible;
 }
 .daily-banner:active{transform:scale(.97)}
+/* Soft fade bleeding downward — planet glow fades into this instead of hard-clipping */
+.daily-banner::after{
+  content:'';position:absolute;
+  bottom:-38px;left:-20px;right:-20px;
+  height:42px;
+  background:linear-gradient(to bottom,rgba(4,6,15,.82) 0%,transparent 100%);
+  pointer-events:none;z-index:5;
+}
 .daily-icon{font-size:26px;flex-shrink:0}
 .daily-text{flex:1;min-width:0}
 .daily-title{font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -366,90 +375,100 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 /* ── 3. 7-DAY REWARD TRACK ── */
 .section-title{
   position:relative;z-index:2;
-  padding:0 18px 10px;
+  padding:16px 18px 10px;
   font-size:11px;font-weight:700;
   color:rgba(255,255,255,.38);letter-spacing:1.2px;
 }
+.section-title:first-of-type{padding-top:4px;}
 .reward-track{
   position:relative;z-index:2;
-  display:flex;gap:8px;
+  display:flex;gap:7px;
   padding:0 18px 4px;
   overflow-x:auto;scrollbar-width:none;
   -webkit-overflow-scrolling:touch;
 }
 .reward-track::-webkit-scrollbar{display:none}
 .rt-item{
-  flex-shrink:0;width:68px;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  padding:12px 6px 10px;
+  flex-shrink:0;width:72px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:14px 6px 12px;
   background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.07);
-  border-radius:18px;
-  transition:all .2s ease;position:relative;
+  border-radius:20px;
+  transition:all .25s ease;position:relative;overflow:hidden;
 }
+/* Bottom accent stripe */
+.rt-item::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 20px 20px;background:rgba(255,255,255,.06)}
+.rt-item.done::after{background:#48c96a}
+.rt-item.today::after{background:linear-gradient(90deg,#7838ff,#4070ff);box-shadow:0 0 10px rgba(100,60,255,.6)}
 .rt-item.done{
-  background:rgba(80,200,100,.08);
-  border-color:rgba(80,200,100,.22);
+  background:rgba(72,201,106,.07);
+  border-color:rgba(72,201,106,.25);
 }
 .rt-item.today{
-  background:rgba(120,80,255,.16);
-  border-color:rgba(160,120,255,.4);
-  box-shadow:0 0 18px rgba(120,80,255,.2);
+  background:rgba(120,80,255,.18);
+  border-color:rgba(160,120,255,.45);
+  box-shadow:0 0 20px rgba(120,80,255,.18);
 }
-.rt-item.locked{opacity:.4}
-.rt-day{font-size:9px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.3)}
-.rt-item.done .rt-day{color:#60d080}
+.rt-item.locked{opacity:.38}
+.rt-day{font-size:9px;font-weight:800;letter-spacing:.7px;color:rgba(255,255,255,.28)}
+.rt-item.done .rt-day{color:#72d990}
 .rt-item.today .rt-day{color:#c0a0ff}
-.rt-icon{font-size:22px;line-height:1}
-.rt-val{font-size:11px;font-weight:700;color:rgba(255,255,255,.6)}
-.rt-item.done .rt-val{color:#60d080}
+.rt-icon{font-size:24px;line-height:1;margin:2px 0}
+.rt-val{font-size:11px;font-weight:800;color:rgba(255,255,255,.55)}
+.rt-item.done .rt-val{color:#72d990}
 .rt-item.today .rt-val{color:#fff}
-/* checkmark on done */
+/* checkmark */
 .rt-check{
-  position:absolute;top:-5px;right:-5px;
-  width:18px;height:18px;border-radius:50%;
-  background:#48c96a;border:2px solid rgba(4,6,15,.8);
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;color:#fff;display:none;
+  position:absolute;top:-6px;right:-6px;
+  width:20px;height:20px;border-radius:50%;
+  background:#48c96a;border:2px solid rgba(4,6,15,.9);
+  display:none;align-items:center;justify-content:center;
+  font-size:9px;color:#fff;font-weight:800;
+  box-shadow:0 0 8px rgba(72,201,106,.5);
 }
 .rt-item.done .rt-check{display:flex}
 
-/* ── 4. WEEK ACTIVITY ── */
+/* ── 4. WEEK ACTIVITY — bar chart ── */
 .week-activity{
   position:relative;z-index:2;
   margin:14px 18px 0;
-  padding:14px 16px;
+  padding:16px 16px 14px;
   background:rgba(255,255,255,.04);
   backdrop-filter:blur(14px);
   border:1px solid rgba(255,255,255,.07);
-  border-radius:18px;
+  border-radius:20px;
 }
-.wa-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.wa-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.45)}
-.wa-total{font-size:11px;color:rgba(255,255,255,.3)}
-.wa-dots{display:flex;gap:8px}
-.wa-dot{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+.wa-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.wa-label{font-size:13px;font-weight:700;color:rgba(255,255,255,.55)}
+.wa-total{font-size:11px;color:#a080ff;font-weight:600;background:rgba(120,80,255,.12);border-radius:8px;padding:3px 9px}
+/* Bar chart area */
+.wa-bars{display:flex;gap:6px;align-items:flex-end;}
+.wa-bar-col{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
 }
-.wa-dot-circle{
-  width:32px;height:32px;border-radius:50%;
+.wa-bar-track{
+  width:100%;height:52px;border-radius:6px;
   background:rgba(255,255,255,.06);
-  border:1.5px solid rgba(255,255,255,.09);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;transition:all .2s;
+  overflow:hidden;display:flex;align-items:flex-end;
 }
-.wa-dot.played .wa-dot-circle{
-  background:rgba(120,80,255,.2);
-  border-color:rgba(160,120,255,.4);
-  box-shadow:0 0 10px rgba(120,80,255,.2);
+.wa-bar-fill{
+  width:100%;border-radius:6px;
+  background:rgba(255,255,255,.08);
+  transition:height .5s cubic-bezier(.34,1.22,.64,1);
 }
-.wa-dot.today .wa-dot-circle{
-  background:linear-gradient(135deg,rgba(140,100,255,.4),rgba(80,140,255,.3));
-  border-color:rgba(180,150,255,.6);
-  box-shadow:0 0 14px rgba(140,100,255,.35);
+.wa-bar-col.played .wa-bar-fill{
+  background:linear-gradient(to top,rgba(120,80,255,.8),rgba(90,140,255,.5));
 }
-.wa-dot-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,.22);letter-spacing:.3px}
-.wa-dot.played .wa-dot-lbl,.wa-dot.today .wa-dot-lbl{color:rgba(180,150,255,.6)}
+.wa-bar-col.today .wa-bar-fill{
+  background:linear-gradient(to top,#7838ff,#4070ff);
+  box-shadow:0 0 12px rgba(100,60,255,.5);
+}
+.wa-bar-lbl{
+  font-size:9px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:.3px;
+}
+.wa-bar-col.played .wa-bar-lbl{color:rgba(160,130,255,.55)}
+.wa-bar-col.today .wa-bar-lbl{color:#c0a0ff}
 
 /* ════════════════════════════════
    TAB 3 — QUESTS
@@ -546,23 +565,25 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .stat-val{font-size:20px;font-weight:800;color:#fff;line-height:1}
 .stat-lbl{font-size:9px;font-weight:600;color:rgba(255,255,255,.3);margin-top:2px;letter-spacing:.4px}
 
-/* Achievements grid */
+/* Achievements grid — same visual weight as stat-cards */
 .achievement-row{
   position:relative;z-index:2;
   display:grid;grid-template-columns:1fr 1fr;
-  gap:7px;padding:0 18px;margin-top:20px;
+  gap:8px;padding:0 18px;margin-top:20px;
 }
 .ach-item{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 10px;background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.07);border-radius:13px;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 10px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);border-radius:16px;
+  position:relative;overflow:hidden;
 }
-.ach-item.unlocked{background:rgba(80,200,100,.06);border-color:rgba(80,200,100,.2)}
+.ach-item.unlocked{background:rgba(80,200,100,.07);border-color:rgba(80,200,100,.22)}
 .ach-item.locked{opacity:.42}
-.ach-icon{font-size:19px;flex-shrink:0}
-.ach-body{min-width:0}
-.ach-name{font-size:11px;font-weight:700;color:#fff;line-height:1.25}
-.ach-sub{font-size:9px;margin-top:2px;color:rgba(255,255,255,.28)}
+.ach-glow{position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;filter:blur(12px);opacity:.3}
+.ach-icon{font-size:22px;flex-shrink:0;z-index:1}
+.ach-body{min-width:0;z-index:1}
+.ach-name{font-size:12px;font-weight:700;color:#fff;line-height:1.25}
+.ach-sub{font-size:10px;margin-top:2px;color:rgba(255,255,255,.3);font-weight:600}
 .ach-item.unlocked .ach-sub{color:#60d080}
 
 /* Profile settings */
@@ -677,7 +698,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .constellation{position:relative;z-index:3;flex:1;display:flex;justify-content:center;align-items:center;padding:6px 16px 0;overflow:hidden;min-height:0;transition:padding .2s ease}
 .constellation.has-timer{padding:2px 16px 0}
 .cw-canvas{position:relative;transform-origin:center;transition:transform .2s ease}
-.cw-slot{position:absolute;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;background:rgba(255,255,255,.04);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:transparent;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.cw-slot{position:absolute;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;background:rgba(255,255,255,.09);backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);color:transparent;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
 .cw-slot.revealed{color:#fff;animation:slotIn .42s cubic-bezier(.34,1.56,.64,1) both}
 .cw-slot.revealed.t-mercury{background:linear-gradient(145deg,rgba(210,110,30,.25),rgba(160,70,15,.12));border-color:rgba(230,150,70,.42);text-shadow:0 0 14px rgba(255,160,60,.95),0 0 30px rgba(220,100,20,.5);box-shadow:0 0 18px rgba(210,110,30,.22),inset 0 1px 0 rgba(255,200,120,.18)}
 .cw-slot.revealed.t-venus{background:linear-gradient(145deg,rgba(210,170,30,.25),rgba(170,130,10,.12));border-color:rgba(240,210,80,.42);text-shadow:0 0 14px rgba(255,220,80,.95);box-shadow:0 0 18px rgba(210,170,30,.22),inset 0 1px 0 rgba(255,240,160,.18)}
@@ -749,6 +770,98 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .ch-card-reward{font-size:11px;font-weight:700;color:#ffd060;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modal-normal-btn{width:100%;padding:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;font-size:14px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;margin-top:4px}
 
+/* ════════════════════════════════
+   SETTINGS / EDIT OVERLAY (generic)
+════════════════════════════════ */
+.settings-overlay{
+  position:absolute;inset:0;z-index:70;
+  background:rgba(4,6,15,.65);backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+.settings-overlay.show{opacity:1;pointer-events:all}
+.settings-sheet{
+  background:linear-gradient(180deg,rgba(20,22,38,.98) 0%,rgba(12,14,28,.99) 100%);
+  border-top:1px solid rgba(255,255,255,.1);
+  border-radius:28px 28px 0 0;
+  max-height:80%;overflow:hidden;
+  display:flex;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .42s cubic-bezier(.22,1,.36,1);
+}
+.settings-overlay.show .settings-sheet{transform:translateY(0)}
+.sheet-content{flex:1;overflow-y:auto;padding:4px 20px 36px;scrollbar-width:none}
+.sheet-content::-webkit-scrollbar{display:none}
+
+/* Edit profile */
+.edit-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:10px 0 20px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.edit-avatar{
+  width:90px;height:90px;border-radius:50%;overflow:hidden;
+  background:#0a0e20;border:2px solid rgba(160,130,255,.45);
+  box-shadow:0 0 24px rgba(120,80,255,.35);
+  position:relative;display:flex;align-items:center;justify-content:center;font-size:42px;
+}
+.edit-avatar-badge{font-size:11px;font-weight:700;color:#c0a0ff;background:rgba(120,80,255,.15);border:1px solid rgba(140,100,255,.25);border-radius:12px;padding:5px 14px;letter-spacing:.3px}
+.edit-field{margin-bottom:14px}
+.edit-field-label{font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.35);margin-bottom:7px}
+.edit-name-input{
+  width:100%;padding:13px 14px;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);
+  border-radius:14px;font-size:15px;font-weight:600;color:#fff;outline:none;
+  -webkit-appearance:none;font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;
+}
+.edit-name-input:focus{border-color:rgba(140,100,255,.55);background:rgba(120,80,255,.09)}
+
+/* Toggle rows (Sound) */
+.toggle-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.toggle-row:last-child{border:none}
+.toggle-info{flex:1}
+.toggle-lbl{font-size:14px;font-weight:600;color:#fff}
+.toggle-sub{font-size:11px;color:rgba(255,255,255,.32);margin-top:2px}
+.toggle-sw{
+  width:50px;height:28px;border-radius:14px;flex-shrink:0;
+  background:rgba(255,255,255,.1);position:relative;cursor:pointer;
+  transition:background .25s;border:1px solid rgba(255,255,255,.1);
+}
+.toggle-sw.on{background:linear-gradient(135deg,#7838ff,#4070ff);border-color:rgba(120,80,255,.5)}
+.toggle-sw .tw-knob{
+  position:absolute;top:3px;left:3px;
+  width:20px;height:20px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 6px rgba(0,0,0,.4);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.toggle-sw.on .tw-knob{transform:translateX(22px)}
+
+/* Theme grid (Appearance) */
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.theme-card{border-radius:16px;overflow:hidden;border:2px solid rgba(255,255,255,.08);cursor:pointer;position:relative;transition:border-color .2s,transform .15s}
+.theme-card.active{border-color:rgba(140,100,255,.65);box-shadow:0 0 20px rgba(120,80,255,.22)}
+.theme-card.locked-theme{opacity:.52;cursor:default}
+.theme-card:active:not(.locked-theme){transform:scale(.96)}
+.tc-swatch{height:68px}
+.tc-footer{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);padding:8px 10px 6px;background:rgba(255,255,255,.04);display:flex;justify-content:space-between;align-items:center}
+.tc-check{width:18px;height:18px;border-radius:50%;background:rgba(120,80,255,.9);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff}
+.tc-soon{font-size:9px;font-weight:700;background:rgba(255,255,255,.1);border-radius:6px;padding:2px 7px;color:rgba(255,255,255,.38);letter-spacing:.5px}
+
+/* FAQ (Help) */
+.faq-item{border-bottom:1px solid rgba(255,255,255,.07)}
+.faq-item:last-child{border:none}
+.faq-q{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 0;font-size:13px;font-weight:600;color:#fff;
+  cursor:pointer;gap:10px;
+}
+.faq-arr{font-size:16px;color:rgba(255,255,255,.28);transition:transform .22s;flex-shrink:0}
+.faq-item.open .faq-arr{transform:rotate(90deg)}
+.faq-a{
+  font-size:12px;color:rgba(255,255,255,.45);line-height:1.65;
+  max-height:0;overflow:hidden;
+  transition:max-height .32s ease,padding .28s ease;
+  padding-bottom:0;
+}
+.faq-item.open .faq-a{max-height:120px;padding-bottom:13px}
+
 /* Win — iOS bottom sheet */
 .win-ov{display:none;position:fixed;inset:0;z-index:80;flex-direction:column;justify-content:flex-end;background:rgba(4,6,15,.72);backdrop-filter:blur(20px)}
 .win-ov.show{display:flex}
@@ -783,6 +896,54 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
 .win-btn-row{padding:14px 20px 36px;flex-shrink:0}
 .next-btn{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#7838ff 0%,#3878ff 100%);border:none;border-radius:18px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.3px;box-shadow:0 0 32px rgba(100,60,255,.4),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .15s ease,box-shadow .15s ease}
 .next-btn:active{transform:scale(.97);box-shadow:0 0 14px rgba(100,60,255,.3)}
+
+/* ── THEME EXTENSIONS (mars / jupiter / saturn) ── */
+.cw-slot.revealed.t-mars{background:linear-gradient(145deg,rgba(200,60,30,.25),rgba(140,25,10,.12));border-color:rgba(230,100,60,.42);text-shadow:0 0 14px rgba(255,100,60,.95),0 0 30px rgba(200,50,20,.5);box-shadow:0 0 18px rgba(200,60,30,.22),inset 0 1px 0 rgba(255,150,100,.18)}
+.cw-slot.revealed.t-jupiter{background:linear-gradient(145deg,rgba(200,130,40,.25),rgba(150,80,20,.12));border-color:rgba(230,170,70,.42);text-shadow:0 0 14px rgba(255,190,80,.95);box-shadow:0 0 18px rgba(200,130,40,.22),inset 0 1px 0 rgba(255,220,140,.18)}
+.cw-slot.revealed.t-saturn{background:linear-gradient(145deg,rgba(200,180,40,.25),rgba(150,130,10,.12));border-color:rgba(240,220,90,.42);text-shadow:0 0 14px rgba(255,240,100,.95);box-shadow:0 0 18px rgba(200,180,40,.22),inset 0 1px 0 rgba(255,250,160,.18)}
+.cur-l.t-mars{text-shadow:0 0 14px rgba(255,100,60,1);border-color:rgba(230,80,50,.5)}
+.cur-l.t-jupiter{text-shadow:0 0 14px rgba(255,190,80,1);border-color:rgba(230,160,50,.5)}
+.cur-l.t-saturn{text-shadow:0 0 14px rgba(255,240,100,1);border-color:rgba(240,220,70,.5)}
+.lnode.sel.t-mars{background:linear-gradient(145deg,rgba(200,60,30,.45),rgba(140,25,10,.3));box-shadow:0 0 22px rgba(200,60,30,.65),inset 0 1px 0 rgba(255,150,100,.25);text-shadow:0 0 12px rgba(255,110,70,1)}
+.lnode.sel.t-jupiter{background:linear-gradient(145deg,rgba(200,130,40,.45),rgba(150,80,20,.3));box-shadow:0 0 22px rgba(200,130,40,.65),inset 0 1px 0 rgba(255,220,140,.25);text-shadow:0 0 12px rgba(255,190,80,1)}
+.lnode.sel.t-saturn{background:linear-gradient(145deg,rgba(200,180,40,.45),rgba(150,130,10,.3));box-shadow:0 0 22px rgba(200,180,40,.65),inset 0 1px 0 rgba(255,250,160,.25);text-shadow:0 0 12px rgba(255,240,100,1)}
+
+/* ── COINS BADGE CLICKABLE ── */
+.map-coins{cursor:pointer;transition:transform .15s ease,background .18s ease;}
+.map-coins:active{transform:scale(.91);background:rgba(255,190,30,.18);}
+
+/* ── COIN SHOP SHEET ── */
+.shop-balance-area{display:flex;align-items:center;justify-content:center;padding:20px 0 10px;flex-direction:column;gap:6px;}
+.shop-balance-num{font-size:34px;font-weight:800;color:#ffd060;line-height:1;}
+.shop-balance-label{font-size:13px;color:rgba(255,255,255,.4);}
+.shop-packs{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 20px 24px;}
+.pack-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:18px 10px 14px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .18s,background .18s;position:relative;overflow:hidden;}
+.pack-card:active{transform:scale(.94);}
+.pack-card.feat{background:rgba(120,80,255,.14);border-color:rgba(140,100,255,.32);}
+.pack-card.feat::before{content:'BEST VALUE';position:absolute;top:0;left:0;right:0;background:linear-gradient(90deg,#7838ff,#4070ff);font-size:9px;font-weight:800;letter-spacing:.8px;color:#fff;text-align:center;padding:3px 0;}
+.pack-icon{font-size:26px;margin-top:2px;}
+.pack-amount{font-size:17px;font-weight:800;color:#ffd060;margin:2px 0;}
+.pack-label{font-size:11px;color:rgba(255,255,255,.45);text-align:center;line-height:1.3;}
+.pack-btn{font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7838ff,#4070ff);border-radius:10px;padding:5px 14px;width:100%;text-align:center;}
+.pack-free{font-size:12px;font-weight:700;color:#60e080;border:1px solid rgba(80,200,100,.3);border-radius:10px;padding:5px 14px;width:100%;text-align:center;background:rgba(60,200,80,.07);}
+.shop-toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(20,22,38,.97);border:1px solid rgba(255,190,30,.3);border-radius:20px;padding:8px 18px;color:#ffd060;font-size:13px;font-weight:700;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap;z-index:200;}
+.shop-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── UNLOCK PLANET DIALOG ── */
+.unlock-inner{padding:28px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.unlock-planet-big{font-size:54px;line-height:1;}
+.unlock-planet-name{font-size:22px;font-weight:800;color:#fff;}
+.unlock-cost-box{display:flex;align-items:center;gap:10px;background:rgba(255,190,30,.08);border:1px solid rgba(255,190,30,.18);border-radius:14px;padding:10px 20px;width:100%;justify-content:center;}
+.uc-label{font-size:13px;color:rgba(255,255,255,.5);}
+.uc-amount{font-size:18px;font-weight:800;color:#ffd060;}
+.unlock-bal{font-size:12px;color:rgba(255,255,255,.4);}
+.unlock-confirm-btn{width:100%;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#7838ff,#4070ff);color:#fff;transition:transform .15s,opacity .2s;}
+.unlock-confirm-btn:active:not(:disabled){transform:scale(.96);}
+.unlock-confirm-btn:disabled{opacity:.38;cursor:not-allowed;}
+.unlock-cancel-btn{width:100%;padding:12px;border-radius:14px;border:none;background:rgba(255,255,255,.06);color:rgba(255,255,255,.55);font-size:14px;cursor:pointer;}
+.prow.locked{cursor:pointer;}
+@keyframes unlockPop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:.9}}
+.prow.just-unlocked .p-glow{animation:unlockPop .65s cubic-bezier(.34,1.56,.64,1) both;}
 </style>
 </head>
 <body>
@@ -802,7 +963,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
       <div class="map-header">
         <div class="map-logo">✦ Stellar Words</div>
         <div class="hdr-right">
-          <div class="map-coins">🪙 <span id="mapCoins">120</span></div>
+          <div class="map-coins" onclick="openShop()">🪙 <span id="mapCoins">120</span></div>
           <div class="bell-btn" onclick="toggleNotifications()">🔔</div>
         </div>
       </div>
@@ -819,7 +980,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
       <div class="tab-scroll">
         <div class="galaxy-path">
 
-          <div class="prow unlocked" onclick="openLevel(0)">
+          <div class="prow unlocked" id="prow-0" onclick="onPlanetTap(0)">
             <div class="p-orb">
               <div class="p-glow" style="background:radial-gradient(circle,rgba(220,130,50,1) 0%,rgba(180,80,20,.4) 60%,transparent 80%)"></div>
               <div class="p-body" style="background:radial-gradient(ellipse at 55% 44%,rgba(90,40,10,.5) 0%,transparent 38%),radial-gradient(ellipse at 32% 62%,rgba(60,25,8,.4) 0%,transparent 30%),radial-gradient(circle at 38% 34%,#d09060,#8c4822,#3e1408)"></div>
@@ -836,7 +997,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
             </div>
           </div>
 
-          <div class="prow unlocked" onclick="openLevel(1)">
+          <div class="prow unlocked" id="prow-1" onclick="onPlanetTap(1)">
             <div class="p-orb">
               <div class="p-glow" style="background:radial-gradient(circle,rgba(240,190,50,1) 0%,rgba(200,140,20,.4) 60%,transparent 80%)"></div>
               <div class="p-body" style="background:radial-gradient(ellipse at 48% 68%,rgba(180,110,10,.35) 0%,transparent 45%),radial-gradient(ellipse at 28% 36%,rgba(255,240,160,.2) 0%,transparent 32%),radial-gradient(circle at 38% 32%,#f4d468,#c08028,#6a3e10)"></div>
@@ -853,7 +1014,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
             </div>
           </div>
 
-          <div class="prow unlocked" onclick="openLevel(2)">
+          <div class="prow unlocked" id="prow-2" onclick="onPlanetTap(2)">
             <div class="p-orb">
               <div class="p-glow" style="background:radial-gradient(circle,rgba(60,160,255,1) 0%,rgba(20,90,210,.4) 60%,transparent 80%)"></div>
               <div class="p-body" style="background:radial-gradient(ellipse at 44% 66%,rgba(20,110,30,.55) 0%,transparent 38%),radial-gradient(ellipse at 22% 38%,rgba(30,100,30,.45) 0%,transparent 24%),radial-gradient(circle at 38% 32%,#62c0f8,#1262c0,#062e80)"></div>
@@ -871,8 +1032,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
             </div>
           </div>
 
-          <div class="prow locked">
+          <div class="prow locked" id="prow-3" onclick="onPlanetTap(3)">
             <div class="p-orb">
+              <div class="p-glow" style="background:radial-gradient(circle,rgba(200,60,30,1) 0%,rgba(160,30,10,.4) 60%,transparent 80%);opacity:0;display:block;"></div>
               <div class="p-body" style="background:radial-gradient(ellipse at 42% 72%,rgba(110,18,8,.5) 0%,transparent 38%),radial-gradient(ellipse at 26% 44%,rgba(180,60,20,.3) 0%,transparent 28%),radial-gradient(circle at 38% 32%,#d45030,#8e1e10,#440808)"></div>
               <div class="lock-ic">🔒</div>
               <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
@@ -880,25 +1042,27 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
             <div class="p-card">
               <div class="p-card-name">Mars</div>
               <div class="p-card-desc">Red dust storms hide powerful words.</div>
-              <div class="p-card-tag">Complete Earth to unlock</div>
+              <div class="p-card-tag">Complete Earth or unlock for 150 🪙</div>
             </div>
           </div>
 
-          <div class="prow locked">
+          <div class="prow locked" id="prow-4" onclick="onPlanetTap(4)">
             <div class="p-orb">
+              <div class="p-glow" style="background:radial-gradient(circle,rgba(210,150,40,1) 0%,rgba(170,100,20,.4) 60%,transparent 80%);opacity:0;display:block;"></div>
               <div class="p-body" style="background:repeating-linear-gradient(to bottom,rgba(180,100,30,.22) 0px,rgba(180,100,30,.22) 7px,rgba(100,50,10,.12) 7px,rgba(100,50,10,.12) 13px),radial-gradient(ellipse at 38% 56%,rgba(200,80,20,.3) 0%,transparent 40%),radial-gradient(circle at 38% 32%,#e0a860,#b06830,#6a3010)"></div>
               <div class="lock-ic">🔒</div>
               <div class="p-stars"><span class="ps">⭐</span><span class="ps">⭐</span><span class="ps">⭐</span></div>
             </div>
             <div class="p-card">
               <div class="p-card-name">Jupiter</div>
-              <div class="p-card-desc">7+ letter words spiral in the storm eye.</div>
-              <div class="p-card-tag">🔒 Locked</div>
+              <div class="p-card-desc">Giant storms hide words in their eye.</div>
+              <div class="p-card-tag">Complete Mars or unlock for 250 🪙</div>
             </div>
           </div>
 
-          <div class="prow locked">
+          <div class="prow locked" id="prow-5" onclick="onPlanetTap(5)">
             <div class="p-orb">
+              <div class="p-glow" style="background:radial-gradient(circle,rgba(220,200,60,1) 0%,rgba(170,150,20,.4) 60%,transparent 80%);opacity:0;display:block;"></div>
               <div class="p-body" style="background:repeating-linear-gradient(to bottom,rgba(220,190,90,.2) 0px,rgba(220,190,90,.2) 5px,rgba(140,110,20,.1) 5px,rgba(140,110,20,.1) 9px),radial-gradient(ellipse at 48% 60%,rgba(180,130,20,.28) 0%,transparent 40%),radial-gradient(circle at 38% 32%,#eed070,#a88830,#5c5010)"></div>
               <div class="p-ring"></div>
               <div class="lock-ic">🔒</div>
@@ -907,7 +1071,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
             <div class="p-card">
               <div class="p-card-name">Saturn</div>
               <div class="p-card-desc">Ringed riddles. Word chains loop the rings.</div>
-              <div class="p-card-tag">🔒 Locked</div>
+              <div class="p-card-tag">Complete Jupiter or unlock for 400 🪙</div>
             </div>
           </div>
 
@@ -922,7 +1086,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
       <div class="tab-header">
         <div class="tab-title">Daily</div>
         <div class="hdr-right">
-          <div class="tab-coins">🪙 <span id="dailyCoins">120</span></div>
+          <div class="tab-coins" onclick="openShop()" style="cursor:pointer;">🪙 <span id="dailyCoins">120</span></div>
           <div class="bell-btn" onclick="toggleNotifications()">🔔</div>
         </div>
       </div>
@@ -1031,20 +1195,41 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
         </div>
 
         <!-- 4. WEEK ACTIVITY -->
-        <div class="section-title" style="margin-top:14px">THIS WEEK</div>
+        <div class="section-title">THIS WEEK</div>
         <div class="week-activity">
           <div class="wa-row">
             <div class="wa-label">Activity</div>
             <div class="wa-total">3 days played</div>
           </div>
-          <div class="wa-dots">
-            <div class="wa-dot played"><div class="wa-dot-circle">✦</div><div class="wa-dot-lbl">MON</div></div>
-            <div class="wa-dot played"><div class="wa-dot-circle">✦</div><div class="wa-dot-lbl">TUE</div></div>
-            <div class="wa-dot today"><div class="wa-dot-circle">▶</div><div class="wa-dot-lbl">WED</div></div>
-            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">THU</div></div>
-            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">FRI</div></div>
-            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">SAT</div></div>
-            <div class="wa-dot"><div class="wa-dot-circle"></div><div class="wa-dot-lbl">SUN</div></div>
+          <div class="wa-bars">
+            <div class="wa-bar-col played">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:80%"></div></div>
+              <div class="wa-bar-lbl">MON</div>
+            </div>
+            <div class="wa-bar-col played">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:55%"></div></div>
+              <div class="wa-bar-lbl">TUE</div>
+            </div>
+            <div class="wa-bar-col today">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:38%"></div></div>
+              <div class="wa-bar-lbl">WED</div>
+            </div>
+            <div class="wa-bar-col">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:0%"></div></div>
+              <div class="wa-bar-lbl">THU</div>
+            </div>
+            <div class="wa-bar-col">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:0%"></div></div>
+              <div class="wa-bar-lbl">FRI</div>
+            </div>
+            <div class="wa-bar-col">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:0%"></div></div>
+              <div class="wa-bar-lbl">SAT</div>
+            </div>
+            <div class="wa-bar-col">
+              <div class="wa-bar-track"><div class="wa-bar-fill" style="height:0%"></div></div>
+              <div class="wa-bar-lbl">SUN</div>
+            </div>
           </div>
         </div>
 
@@ -1134,7 +1319,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
         <!-- Hero -->
         <div class="profile-hero">
           <div class="prof-hero-glow"></div>
-          <div class="prof-top-btn left" onclick="editName()">✏️</div>
+          <div class="prof-top-btn left" onclick="openEditProfile()">✏️</div>
           <div class="prof-top-btn right" onclick="toggleNotifications()">🔔</div>
 
           <div class="prof-ring-wrap">
@@ -1194,9 +1379,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
           <span>ACHIEVEMENTS</span><span style="color:#a080ff;font-size:10px;font-weight:700">3 / 12</span>
         </div>
         <div class="achievement-row">
-          <div class="ach-item unlocked"><div class="ach-icon">🚀</div><div class="ach-body"><div class="ach-name">First Launch</div><div class="ach-sub">Unlocked</div></div></div>
-          <div class="ach-item unlocked"><div class="ach-icon">🔥</div><div class="ach-body"><div class="ach-name">3-Day Streak</div><div class="ach-sub">Unlocked</div></div></div>
-          <div class="ach-item unlocked"><div class="ach-icon">🪨</div><div class="ach-body"><div class="ach-name">Mercury Done</div><div class="ach-sub">Unlocked</div></div></div>
+          <div class="ach-item unlocked"><div class="ach-glow" style="background:#60d080"></div><div class="ach-icon">🚀</div><div class="ach-body"><div class="ach-name">First Launch</div><div class="ach-sub">Unlocked ✓</div></div></div>
+          <div class="ach-item unlocked"><div class="ach-glow" style="background:#ff8040"></div><div class="ach-icon">🔥</div><div class="ach-body"><div class="ach-name">3-Day Streak</div><div class="ach-sub">Unlocked ✓</div></div></div>
+          <div class="ach-item unlocked"><div class="ach-glow" style="background:#d09060"></div><div class="ach-icon">🪨</div><div class="ach-body"><div class="ach-name">Mercury Done</div><div class="ach-sub">Unlocked ✓</div></div></div>
           <div class="ach-item locked"><div class="ach-icon">🌍</div><div class="ach-body"><div class="ach-name">Earth Master</div><div class="ach-sub">0 / 3 ★</div></div></div>
           <div class="ach-item locked"><div class="ach-icon">💎</div><div class="ach-body"><div class="ach-name">Gem Hunter</div><div class="ach-sub">0 / 5</div></div></div>
           <div class="ach-item locked"><div class="ach-icon">🏆</div><div class="ach-body"><div class="ach-name">Champion</div><div class="ach-sub">Locked</div></div></div>
@@ -1206,9 +1391,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
         <div class="settings-row">
           <div class="section-title" style="margin-bottom:9px">SETTINGS</div>
           <div class="setting-list">
-            <div class="setting-item"><div class="setting-icon">🔊</div><div class="setting-label">Sound & Haptics</div><div class="setting-arrow">›</div></div>
-            <div class="setting-item"><div class="setting-icon">🌙</div><div class="setting-label">Appearance</div><div class="setting-arrow">›</div></div>
-            <div class="setting-item"><div class="setting-icon">❓</div><div class="setting-label">Help & Support</div><div class="setting-arrow">›</div></div>
+            <div class="setting-item" onclick="openSheet('soundSheet')"><div class="setting-icon">🔊</div><div class="setting-label">Sound & Haptics</div><div class="setting-arrow">›</div></div>
+            <div class="setting-item" onclick="openSheet('appearanceSheet')"><div class="setting-icon">🌙</div><div class="setting-label">Appearance</div><div class="setting-arrow">›</div></div>
+            <div class="setting-item" onclick="openSheet('helpSheet')"><div class="setting-icon">❓</div><div class="setting-label">Help & Support</div><div class="setting-arrow">›</div></div>
           </div>
         </div>
 
@@ -1363,6 +1548,203 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,'SF P
     </div>
   </div>
 
+  <!-- ══ EDIT PROFILE SHEET ══ -->
+  <div class="settings-overlay" id="editProfileSheet" onclick="closeSettingSheet(event,'editProfileSheet')">
+    <div class="settings-sheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">Edit Profile</div>
+        <div class="notif-close" onclick="closeSheet('editProfileSheet')">✕</div>
+      </div>
+      <div class="sheet-content">
+        <div class="edit-avatar-wrap" onclick="triggerPhotoUpload()">
+          <div class="edit-avatar">
+            <div id="editAvatarEmoji" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px">🧑‍🚀</div>
+            <img id="editAvatarImg" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;border-radius:50%">
+          </div>
+          <div class="edit-avatar-badge">📷 Change photo</div>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+        </div>
+        <div class="edit-field">
+          <div class="edit-field-label">DISPLAY NAME</div>
+          <input type="text" id="editNameInput" class="edit-name-input" placeholder="Your name" value="Sandora" maxlength="20">
+        </div>
+        <button class="dc-cta" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SOUND SETTINGS SHEET ══ -->
+  <div class="settings-overlay" id="soundSheet" onclick="closeSettingSheet(event,'soundSheet')">
+    <div class="settings-sheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">Sound & Haptics</div>
+        <div class="notif-close" onclick="closeSheet('soundSheet')">✕</div>
+      </div>
+      <div class="sheet-content">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-lbl">Sound Effects</div>
+            <div class="toggle-sub">Word completion, taps, actions</div>
+          </div>
+          <div class="toggle-sw on" id="sfxToggle" onclick="toggleSw('sfxToggle')"><div class="tw-knob"></div></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-lbl">Background Music</div>
+            <div class="toggle-sub">Ambient space atmosphere</div>
+          </div>
+          <div class="toggle-sw" id="musicToggle" onclick="toggleSw('musicToggle')"><div class="tw-knob"></div></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-lbl">Haptic Feedback</div>
+            <div class="toggle-sub">Vibration on correct words</div>
+          </div>
+          <div class="toggle-sw on" id="hapticToggle" onclick="toggleSw('hapticToggle')"><div class="tw-knob"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ APPEARANCE SHEET ══ -->
+  <div class="settings-overlay" id="appearanceSheet" onclick="closeSettingSheet(event,'appearanceSheet')">
+    <div class="settings-sheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">Appearance</div>
+        <div class="notif-close" onclick="closeSheet('appearanceSheet')">✕</div>
+      </div>
+      <div class="sheet-content">
+        <div class="section-title" style="padding:10px 0 12px;letter-spacing:1px">THEME</div>
+        <div class="theme-grid">
+          <div class="theme-card active">
+            <div class="tc-swatch" style="background:linear-gradient(145deg,#080c1e 0%,#14103a 50%,#0a1830 100%)"></div>
+            <div class="tc-footer">Deep Space<div class="tc-check">✓</div></div>
+          </div>
+          <div class="theme-card locked-theme">
+            <div class="tc-swatch" style="background:linear-gradient(145deg,#041408 0%,#0c2814 50%,#062010 100%)"></div>
+            <div class="tc-footer">Nebula Green<div class="tc-soon">SOON</div></div>
+          </div>
+          <div class="theme-card locked-theme">
+            <div class="tc-swatch" style="background:linear-gradient(145deg,#1a0606 0%,#340c0c 50%,#220808 100%)"></div>
+            <div class="tc-footer">Red Giant<div class="tc-soon">SOON</div></div>
+          </div>
+          <div class="theme-card locked-theme">
+            <div class="tc-swatch" style="background:linear-gradient(145deg,#081420 0%,#102038 50%,#0c1c2c 100%)"></div>
+            <div class="tc-footer">Ice Moon<div class="tc-soon">SOON</div></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(255,255,255,.28);text-align:center;margin-top:8px;line-height:1.6">More themes coming in future updates ✨</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HELP SHEET ══ -->
+  <div class="settings-overlay" id="helpSheet" onclick="closeSettingSheet(event,'helpSheet')">
+    <div class="settings-sheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">Help & Support</div>
+        <div class="notif-close" onclick="closeSheet('helpSheet')">✕</div>
+      </div>
+      <div class="sheet-content">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How do I form words? <span class="faq-arr">›</span></div>
+          <div class="faq-a">Drag your finger across the letter orb to connect letters and form a word. Release to submit. The path line shows your current selection.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">What are bonus words? <span class="faq-arr">›</span></div>
+          <div class="faq-a">Bonus words aren't required to finish the level, but finding them earns extra coins and XP. They're shown separately from required words.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How does the daily challenge work? <span class="faq-arr">›</span></div>
+          <div class="faq-a">A new puzzle unlocks every day at midnight. Complete it for 3× XP and special rewards. Daily puzzles reset every 24 hours.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">What are streaks? <span class="faq-arr">›</span></div>
+          <div class="faq-a">Play at least once per day to grow your streak. Reach Day 7 for a gem reward. Missing a day resets your streak back to zero.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How do I earn coins? <span class="faq-arr">›</span></div>
+          <div class="faq-a">Coins drop for completing levels, finding bonus words, and finishing daily quests. Use them to buy hints and power-ups in the game.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">How do I unlock new planets? <span class="faq-arr">›</span></div>
+          <div class="faq-a">Complete all required words on the current planet to unlock the next one. Earn stars by finding more bonus words and completing challenges.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COINS SHOP SHEET -->
+  <div class="settings-overlay" id="shopSheet" onclick="closeSettingSheet(event,'shopSheet')">
+    <div class="settings-sheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">🪙 Coin Shop</div>
+        <div class="notif-close" onclick="closeSheet('shopSheet')">✕</div>
+      </div>
+      <div class="sheet-content" style="position:relative;">
+        <div class="shop-balance-area">
+          <div class="shop-balance-num">🪙 <span id="shopBalance">120</span></div>
+          <div class="shop-balance-label">Your current balance</div>
+        </div>
+        <div class="shop-packs">
+          <div class="pack-card" onclick="buyCoins(100)">
+            <div class="pack-icon">🌠</div>
+            <div class="pack-amount">+100 🪙</div>
+            <div class="pack-label">Shooting Star</div>
+            <div class="pack-free">FREE</div>
+          </div>
+          <div class="pack-card feat" onclick="buyCoins(600)">
+            <div class="pack-icon">☄️</div>
+            <div class="pack-amount">+600 🪙</div>
+            <div class="pack-label">Comet Trail</div>
+            <div class="pack-btn">$0.99</div>
+          </div>
+          <div class="pack-card" onclick="buyCoins(1400)">
+            <div class="pack-icon">🌌</div>
+            <div class="pack-amount">+1400 🪙</div>
+            <div class="pack-label">Nebula Cache</div>
+            <div class="pack-btn">$1.99</div>
+          </div>
+          <div class="pack-card" onclick="buyCoins(3500)">
+            <div class="pack-icon">🪐</div>
+            <div class="pack-amount">+3500 🪙</div>
+            <div class="pack-label">Galaxy Vault</div>
+            <div class="pack-btn">$3.99</div>
+          </div>
+        </div>
+        <div class="shop-toast" id="shopToast"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNLOCK PLANET DIALOG -->
+  <div class="settings-overlay" id="unlockSheet" onclick="closeSettingSheet(event,'unlockSheet')">
+    <div class="settings-sheet">
+      <div class="notif-handle"></div>
+      <div class="notif-header">
+        <div class="notif-title">Unlock Planet</div>
+        <div class="notif-close" onclick="closeSheet('unlockSheet')">✕</div>
+      </div>
+      <input type="hidden" id="unlockPlanetIdx" value="3">
+      <div class="unlock-inner">
+        <div class="unlock-planet-big" id="unlockPlanetEmoji">🔴</div>
+        <div class="unlock-planet-name" id="unlockPlanetName">Mars</div>
+        <div class="unlock-cost-box">
+          <span class="uc-label">Unlock for</span>
+          <span class="uc-amount">🪙 <span id="unlockCost">150</span></span>
+        </div>
+        <div class="unlock-bal">Your balance: 🪙 <span id="unlockCurrentCoins">120</span></div>
+        <button class="unlock-confirm-btn" id="unlockConfirmBtn" onclick="doUnlock()">Unlock for 150 🪙</button>
+        <button class="unlock-cancel-btn" onclick="closeSheet('unlockSheet')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /phone -->
 
 <!-- WIN -->
@@ -1442,7 +1824,40 @@ const LEVELS=[
    ambient:'linear-gradient(to top,rgba(20,100,220,.22) 0%,rgba(10,60,160,.08) 40%,transparent 75%)',
    orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(50,140,255,.65) 30%,transparent 60%,rgba(20,80,200,.35) 90%,transparent 100%)',
    letters:['S','P','I','N','E'],words:['SPIN','SNIPE','PINE','PIN','SIN','SINE','PEN','SPINE','PINES','PEIN'],required:['SNIPE','SPIN','PINE','SIN','PIN'],
-   placements:[{word:'SNIPE',dir:'H',row:0,col:0},{word:'SPIN',dir:'H',row:2,col:0},{word:'SIN',dir:'V',row:2,col:0},{word:'PIN',dir:'V',row:2,col:1},{word:'PINE',dir:'V',row:1,col:2}]}
+   placements:[{word:'SNIPE',dir:'H',row:0,col:0},{word:'SPIN',dir:'H',row:2,col:0},{word:'SIN',dir:'V',row:2,col:0},{word:'PIN',dir:'V',row:2,col:1},{word:'PINE',dir:'V',row:1,col:2}]},
+  // 3: Mars
+  {planet:'🔴',name:'Mars',theme:'mars',
+   bgImage:'',
+   starTint:[255,130,80],
+   sphere:{bg:'radial-gradient(circle at 42% 38%,#d45030,#8e1e10,#440808)',glow:'rgba(200,60,30,.5)'},
+   farBg:'radial-gradient(circle at 42% 38%,#d45030,#8e1e10,#440808)',farGlow:'rgba(200,60,30,1)',
+   tintTop:'radial-gradient(ellipse at 80% 0%,rgba(200,60,30,.12) 0%,transparent 55%)',
+   ambient:'linear-gradient(to top,rgba(200,60,30,.22) 0%,rgba(140,25,10,.08) 40%,transparent 75%)',
+   orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(210,80,40,.65) 30%,transparent 60%,rgba(170,40,20,.35) 90%,transparent 100%)',
+   letters:['F','R','O','S','T'],words:['FROST','FORT','SORT','ROTS','TORS','ORTS','FORTS','RORT'],required:['FROST','FORT','SORT','ROTS','TORS'],
+   placements:[{word:'FROST',dir:'H',row:0,col:0},{word:'SORT',dir:'H',row:1,col:1},{word:'FORT',dir:'H',row:2,col:0},{word:'ROTS',dir:'H',row:3,col:0},{word:'TORS',dir:'H',row:4,col:0}]},
+  // 4: Jupiter
+  {planet:'🟤',name:'Jupiter',theme:'jupiter',
+   bgImage:'',
+   starTint:[255,190,100],
+   sphere:{bg:'radial-gradient(ellipse at 38% 56%,rgba(200,80,20,.3) 0%,transparent 40%),repeating-linear-gradient(to bottom,rgba(180,100,30,.18) 0px,rgba(180,100,30,.18) 7px,rgba(100,50,10,.1) 7px,rgba(100,50,10,.1) 13px),radial-gradient(circle at 38% 32%,#e0a860,#b06830,#6a3010)',glow:'rgba(200,130,40,.5)'},
+   farBg:'radial-gradient(circle at 42% 38%,#e0a860,#b06830,#6a3010)',farGlow:'rgba(200,130,40,1)',
+   tintTop:'radial-gradient(ellipse at 80% 0%,rgba(200,130,40,.12) 0%,transparent 55%)',
+   ambient:'linear-gradient(to top,rgba(200,130,40,.22) 0%,rgba(140,70,10,.08) 40%,transparent 75%)',
+   orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(220,150,50,.65) 30%,transparent 60%,rgba(180,100,20,.35) 90%,transparent 100%)',
+   letters:['G','L','O','W','S'],words:['GLOWS','GLOW','SLOW','OWLS','LOWS','GOLS','WOGS','SLOB'],required:['GLOWS','GLOW','SLOW','OWLS','LOWS'],
+   placements:[{word:'GLOWS',dir:'H',row:0,col:0},{word:'SLOW',dir:'H',row:1,col:1},{word:'GLOW',dir:'H',row:2,col:0},{word:'OWLS',dir:'H',row:3,col:0},{word:'LOWS',dir:'H',row:4,col:0}]},
+  // 5: Saturn
+  {planet:'🪐',name:'Saturn',theme:'saturn',
+   bgImage:'',
+   starTint:[240,230,100],
+   sphere:{bg:'radial-gradient(ellipse at 48% 60%,rgba(180,130,20,.28) 0%,transparent 40%),repeating-linear-gradient(to bottom,rgba(220,190,90,.2) 0px,rgba(220,190,90,.2) 5px,rgba(140,110,20,.1) 5px,rgba(140,110,20,.1) 9px),radial-gradient(circle at 38% 32%,#eed070,#a88830,#5c5010)',glow:'rgba(210,180,40,.5)'},
+   farBg:'radial-gradient(circle at 42% 38%,#eed070,#a88830,#5c5010)',farGlow:'rgba(210,180,40,1)',
+   tintTop:'radial-gradient(ellipse at 80% 0%,rgba(210,180,40,.12) 0%,transparent 55%)',
+   ambient:'linear-gradient(to top,rgba(210,180,40,.22) 0%,rgba(160,130,10,.08) 40%,transparent 75%)',
+   orbRing:'conic-gradient(from 0deg,transparent 0%,rgba(230,200,50,.65) 30%,transparent 60%,rgba(180,150,20,.35) 90%,transparent 100%)',
+   letters:['S','P','A','C','E'],words:['SPACE','PACE','CAPE','CASE','ACES','SPEC','CAPS','PECS'],required:['SPACE','PACE','CAPE','CASE','ACES'],
+   placements:[{word:'SPACE',dir:'H',row:0,col:0},{word:'PACE',dir:'H',row:1,col:1},{word:'CAPE',dir:'H',row:2,col:0},{word:'CASE',dir:'H',row:3,col:0},{word:'ACES',dir:'H',row:4,col:0}]}
 ];
 
 /* ── DAILY PUZZLES (7 unique, cycle by day-of-year) ── */
@@ -1484,12 +1899,90 @@ function getDailyPuzzle(){
   return Object.assign({},base,{letters:dp.letters,words:dp.words,required:dp.required,placements:dp.placements,name:'Daily Challenge'});
 }
 
+/* ── GAME STATE ── */
+const UNLOCK_COST=[0,0,80,150,250,400];
+const AUTO_UNLOCK_AFTER=[-1,-1,1,2,3,4]; // completing planet N unlocks planet at this index
+function _defState(){return{coins:120,unlocked:[0,1],stars:{0:2,1:1},completed:[]};}
+let STATE;
+try{const _s=localStorage.getItem('swState');STATE=_s?Object.assign(_defState(),JSON.parse(_s)):_defState();}catch(e){STATE=_defState();}
+if(!Array.isArray(STATE.unlocked))STATE.unlocked=[0,1];
+if(typeof STATE.stars!=='object'||!STATE.stars)STATE.stars={0:2,1:1};
+if(!Array.isArray(STATE.completed))STATE.completed=[];
+function saveState(){try{localStorage.setItem('swState',JSON.stringify({coins:STATE.coins,unlocked:STATE.unlocked,stars:STATE.stars,completed:STATE.completed}));}catch(e){}}
+function updateCoinsDisplay(){
+  const c=STATE.coins;
+  ['mapCoins','dailyCoins'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=c;});
+  const sc=document.getElementById('shopBalance');if(sc)sc.textContent=c;
+}
+function renderPlanetUI(){
+  LEVELS.forEach((_,i)=>{
+    const prow=document.getElementById('prow-'+i);if(!prow)return;
+    const isUnlocked=STATE.unlocked.includes(i);
+    prow.classList.toggle('unlocked',isUnlocked);
+    prow.classList.toggle('locked',!isUnlocked);
+    const lockIc=prow.querySelector('.lock-ic');
+    if(lockIc)lockIc.style.display=isUnlocked?'none':'flex';
+    const glow=prow.querySelector('.p-glow');
+    if(glow){glow.style.opacity=isUnlocked?'0.9':'0';}
+    const pCard=prow.querySelector('.p-card');
+    if(pCard)pCard.style.opacity=isUnlocked?'1':'0.38';
+    const pBody=prow.querySelector('.p-body');
+    if(pBody)pBody.style.filter=isUnlocked?'none':'grayscale(.65) brightness(.55)';
+    const starsEarned=STATE.stars[i]||0;
+    prow.querySelectorAll('.ps').forEach((el,si)=>el.classList.toggle('on',si<starsEarned));
+    const tag=prow.querySelector('.p-card-tag');
+    if(tag&&!isUnlocked){
+      const cost=UNLOCK_COST[i],autoAfter=AUTO_UNLOCK_AFTER[i];
+      const autoName=autoAfter>=0&&LEVELS[autoAfter]?LEVELS[autoAfter].name:'';
+      if(cost>0&&autoAfter>=0)tag.textContent=`Complete ${autoName} or unlock for ${cost} 🪙`;
+      else if(cost>0)tag.textContent=`Unlock for ${cost} 🪙`;
+      else if(autoAfter>=0)tag.textContent=`Complete ${autoName} to unlock`;
+    }
+  });
+  updateCoinsDisplay();
+}
+function onPlanetTap(i){if(STATE.unlocked.includes(i)){openLevel(i);}else{showUnlockDialog(i);}}
+function showUnlockDialog(i){
+  const lv=LEVELS[i];if(!lv)return;
+  const cost=UNLOCK_COST[i],canAfford=STATE.coins>=cost;
+  document.getElementById('unlockPlanetEmoji').textContent=lv.planet;
+  document.getElementById('unlockPlanetName').textContent=lv.name;
+  document.getElementById('unlockCost').textContent=cost;
+  document.getElementById('unlockCurrentCoins').textContent=STATE.coins;
+  document.getElementById('unlockPlanetIdx').value=i;
+  const btn=document.getElementById('unlockConfirmBtn');
+  btn.disabled=!canAfford;
+  btn.textContent=canAfford?`Unlock for ${cost} 🪙`:`Need ${cost-STATE.coins} more 🪙`;
+  openSheet('unlockSheet');
+}
+function doUnlock(){
+  const i=+document.getElementById('unlockPlanetIdx').value,cost=UNLOCK_COST[i];
+  if(STATE.coins<cost)return;
+  STATE.coins-=cost;
+  if(!STATE.unlocked.includes(i))STATE.unlocked.push(i);
+  saveState();
+  closeSheet('unlockSheet');
+  const prow=document.getElementById('prow-'+i);
+  if(prow){prow.classList.add('just-unlocked');setTimeout(()=>prow.classList.remove('just-unlocked'),900);}
+  renderPlanetUI();
+}
+function openShop(){document.getElementById('shopBalance').textContent=STATE.coins;openSheet('shopSheet');}
+function buyCoins(amount){
+  STATE.coins+=amount;saveState();updateCoinsDisplay();
+  document.getElementById('shopBalance').textContent=STATE.coins;
+  const uc=document.getElementById('unlockCurrentCoins');if(uc)uc.textContent=STATE.coins;
+  const btn=document.getElementById('unlockConfirmBtn');
+  if(btn){const i=+document.getElementById('unlockPlanetIdx').value,cost=UNLOCK_COST[i];btn.disabled=STATE.coins<cost;btn.textContent=STATE.coins>=cost?`Unlock for ${cost} 🪙`:`Need ${cost-STATE.coins} more 🪙`;}
+  const t=document.getElementById('shopToast');if(!t)return;
+  t.textContent='+'+amount+' 🪙';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);
+}
+
 let lvlIdx=2,lvl=LEVELS[2],found=new Set(),sel=[],dragging=false,lpos=[];
 let challengeMode=null,timerInterval=null,timeLeft=60;
 
 /* ── GAME NAVIGATION ── */
 function openLevel(i,mode){
-  if(i>2)return;
+  if(i>=LEVELS.length)return;
   lvlIdx=i;
   lvl=(mode==='daily')?getDailyPuzzle():LEVELS[i];
   found=new Set();sel=[];challengeMode=null;stopTimer();
@@ -1500,10 +1993,11 @@ function openLevel(i,mode){
   document.getElementById('wcTitle').textContent=lvl.name+' Cleared!';
   document.getElementById('challengeBar').style.display='none';
   buildCrossword();buildOrb();resetSel();
+  document.getElementById('gameCoins').textContent=STATE.coins;
 
   if(mode==='daily'){challengeMode='daily';document.getElementById('gnSub').textContent=`Daily Challenge · ${lvl.required.length} words`;}
   else{document.getElementById('challengeModal').classList.add('show');document.getElementById('modalTitle').textContent=lvl.planet+' '+lvl.name+' — Choose Mode';}
-  document.getElementById('gameScreen').className='overlay off-r';
+  document.getElementById('gameScreen').className=mode==='daily'?'overlay on':'overlay off-r';
   document.querySelector('.nav-bar').classList.add('nav-hidden');
 }
 
@@ -1519,13 +2013,55 @@ function closeNotifOutside(e){
   if(e.target===document.getElementById('notifOverlay'))toggleNotifications();
 }
 
-/* ── EDIT NAME ── */
-function editName(){
-  const cur=document.querySelector('.profile-name');
-  if(!cur)return;
-  const name=prompt('Enter your name:',cur.textContent);
-  if(name&&name.trim())cur.textContent=name.trim();
+/* ── SETTINGS SHEETS ── */
+function openSheet(id){document.getElementById(id).classList.add('show')}
+function closeSheet(id){document.getElementById(id).classList.remove('show')}
+function closeSettingSheet(e,id){if(e.target===document.getElementById(id))closeSheet(id)}
+
+/* ── EDIT PROFILE ── */
+function openEditProfile(){
+  const name=document.querySelector('.profile-name');
+  if(name)document.getElementById('editNameInput').value=name.textContent;
+  // Sync current avatar to edit sheet
+  const mainImg=document.querySelector('.prof-avatar img');
+  if(mainImg&&mainImg.src&&mainImg.style.display!=='none'){
+    document.getElementById('editAvatarImg').src=mainImg.src;
+    document.getElementById('editAvatarImg').style.display='block';
+    document.getElementById('editAvatarEmoji').style.display='none';
+  }
+  openSheet('editProfileSheet');
 }
+function saveProfile(){
+  const name=document.getElementById('editNameInput').value.trim();
+  if(name)document.querySelector('.profile-name').textContent=name;
+  closeSheet('editProfileSheet');
+}
+function triggerPhotoUpload(){document.getElementById('photoInput').click()}
+function handlePhotoUpload(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const src=ev.target.result;
+    // Edit sheet preview
+    document.getElementById('editAvatarImg').src=src;
+    document.getElementById('editAvatarImg').style.display='block';
+    document.getElementById('editAvatarEmoji').style.display='none';
+    // Main profile avatar
+    let img=document.querySelector('.prof-avatar img');
+    if(!img){img=document.createElement('img');document.querySelector('.prof-avatar').prepend(img);}
+    img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center 15%;display:block;border-radius:50%';
+    const emoji=document.querySelector('.prof-avatar-emoji');
+    if(emoji)emoji.style.display='none';
+  };
+  reader.readAsDataURL(f);
+}
+function editName(){openEditProfile();}
+
+/* ── TOGGLE SWITCH ── */
+function toggleSw(id){document.getElementById(id).classList.toggle('on')}
+
+/* ── FAQ ── */
+function toggleFaq(item){item.classList.toggle('open')}
 
 function goBack(){
   stopTimer();
@@ -1627,7 +2163,7 @@ function updateSvg(curX,curY){
   for(let i=0;i<pts.length-1;i++){const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',pts[i].x);l.setAttribute('y1',pts[i].y);l.setAttribute('x2',pts[i+1].x);l.setAttribute('y2',pts[i+1].y);l.setAttribute('class','ln-solid');l.setAttribute('stroke',col);svg.appendChild(l);}
   if(dragging&&pts.length>0&&curX!==undefined){const rect=document.getElementById('orb').getBoundingClientRect(),last=pts[pts.length-1],l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',last.x);l.setAttribute('y1',last.y);l.setAttribute('x2',curX-rect.left);l.setAttribute('y2',curY-rect.top);l.setAttribute('class','ln-dash');l.setAttribute('stroke',col.replace('.85','.35'));svg.appendChild(l);}
 }
-function updateNodes(){const idxs=new Set(sel.map(s=>s.index));lpos.forEach((_,i)=>{const n=document.getElementById(`ln-${i}`);n.classList.remove('sel','t-mercury','t-venus','t-earth','t-mars');if(idxs.has(i))n.classList.add('sel','t-'+lvl.theme);});document.getElementById('orb').classList.toggle('active',idxs.size>0);}
+function updateNodes(){const idxs=new Set(sel.map(s=>s.index));lpos.forEach((_,i)=>{const n=document.getElementById(`ln-${i}`);n.classList.remove('sel','t-mercury','t-venus','t-earth','t-mars','t-jupiter','t-saturn');if(idxs.has(i))n.classList.add('sel','t-'+lvl.theme);});document.getElementById('orb').classList.toggle('active',idxs.size>0);}
 function updateCurLetters(){const wrap=document.getElementById('curLetters');wrap.innerHTML='';sel.forEach(s=>{const el=document.createElement('div');el.className='cur-l t-'+lvl.theme;el.textContent=s.letter;wrap.appendChild(el);});}
 function onStart(e){e.preventDefault();dragging=true;sel=[];const pt=e.touches?e.touches[0]:e,pos=getNodeAt(pt.clientX,pt.clientY);if(pos){sel.push(pos);updateNodes();updateCurLetters();}updateSvg(pt.clientX,pt.clientY);}
 function onMove(e){e.preventDefault();if(!dragging)return;const pt=e.touches?e.touches[0]:e,pos=getNodeAt(pt.clientX,pt.clientY);if(pos){const ai=sel.findIndex(s=>s.index===pos.index);if(ai===-1){sel.push(pos);updateNodes();updateCurLetters();}else if(ai===sel.length-2){sel.pop();updateNodes();updateCurLetters();}}updateSvg(pt.clientX,pt.clientY);}
@@ -1643,7 +2179,8 @@ function trySubmit(){
   if((isReq||isBonus)&&!found.has(word)){
     found.add(word);const mult=challengeMode==='daily'?3:challengeMode==='speed'?2:1;
     const earned=word.length*(isBonus?8:5)*mult;
-    ['gameCoins','mapCoins','dailyCoins'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=+el.textContent+earned;});
+    STATE.coins+=earned;saveState();
+    document.getElementById('gameCoins').textContent=STATE.coins;updateCoinsDisplay();
     if(isReq)revealWord(word);else showBonus(word);
     resetSel();
     if(lvl.required.every(w=>found.has(w))){stopTimer();setTimeout(showWin,750);}
@@ -1659,9 +2196,22 @@ function showBonus(word){const c=document.getElementById('constellation'),t=docu
 /* ── WIN ── */
 function showWin(){
   const bonus=[...found].filter(w=>!lvl.required.includes(w)).length;
-  const stars=bonus>=3?3:bonus>=1?2:1;const mult=challengeMode==='daily'?3:challengeMode==='speed'?2:challengeMode==='perfect'?4:1;
-  document.getElementById('wrXp').textContent='+'+(stars*25+lvl.required.length*10)*mult;
-  document.getElementById('wrCoins').textContent='+'+(stars*15+5*lvl.required.length)*mult;
+  const allFound=found.size>=lvl.words.length;
+  const stars=allFound?3:bonus>=2?2:bonus>=1?2:1;
+  const mult=challengeMode==='daily'?3:challengeMode==='speed'?2:challengeMode==='perfect'?4:1;
+  const earnedCoins=(stars*15+5*lvl.required.length)*mult;
+  const earnedXp=(stars*25+lvl.required.length*10)*mult;
+  // Persist to STATE
+  STATE.coins+=earnedCoins;
+  STATE.stars[lvlIdx]=Math.max(STATE.stars[lvlIdx]||0,stars);
+  if(!STATE.completed.includes(lvlIdx))STATE.completed.push(lvlIdx);
+  // Auto-unlock next planet
+  const next=lvlIdx+1;
+  if(next<LEVELS.length&&!STATE.unlocked.includes(next))STATE.unlocked.push(next);
+  saveState();renderPlanetUI();
+  document.getElementById('gameCoins').textContent=STATE.coins;
+  document.getElementById('wrXp').textContent='+'+earnedXp;
+  document.getElementById('wrCoins').textContent='+'+earnedCoins;
   document.getElementById('wrStars').textContent=stars+'/3';
   [0,1,2].forEach(i=>{document.getElementById('ws'+i).classList.remove('on');if(i<stars)setTimeout(()=>document.getElementById('ws'+i).classList.add('on'),i*220+350);});
   document.getElementById('wcSub').textContent=challengeMode?challengeMode+' mode · '+mult+'× bonus!':'All words discovered';
@@ -1671,8 +2221,8 @@ function nextLevel(){document.getElementById('winOv').classList.remove('show');g
 
 /* ── ACTIONS ── */
 function doShuffle(){if(challengeMode==='hard')return;const a=lvl.letters;for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}buildOrb();resetSel();}
-function doHint(){if(challengeMode==='hard')return;const coins=+document.getElementById('gameCoins').textContent;if(coins<10)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[0];document.getElementById('gameCoins').textContent=coins-10;resetSel();for(const letter of word){const pos=lpos.find(p=>p.letter===letter&&!sel.some(s=>s.index===p.index));if(pos)sel.push(pos);}updateNodes();updateCurLetters();updateSvg();setTimeout(trySubmit,900);}
-function doScan(){const coins=+document.getElementById('gameCoins').textContent;if(coins<15)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[Math.floor(Math.random()*rem.length)],p=lvl.placements.find(x=>x.word===word);const hidden=[];for(let i=0;i<word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,slot=document.getElementById(`sl-${r}-${c}`);if(slot&&!slot.classList.contains('revealed'))hidden.push({r,c,letter:word[i]});}if(!hidden.length)return;document.getElementById('gameCoins').textContent=coins-15;const cell=hidden[Math.floor(Math.random()*hidden.length)],slot=document.getElementById(`sl-${cell.r}-${cell.c}`);slot.classList.add('revealed','t-'+lvl.theme);slot.textContent=cell.letter;}
+function doHint(){if(challengeMode==='hard')return;if(STATE.coins<10)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[0];STATE.coins-=10;saveState();document.getElementById('gameCoins').textContent=STATE.coins;updateCoinsDisplay();resetSel();for(const letter of word){const pos=lpos.find(p=>p.letter===letter&&!sel.some(s=>s.index===p.index));if(pos)sel.push(pos);}updateNodes();updateCurLetters();updateSvg();setTimeout(trySubmit,900);}
+function doScan(){if(STATE.coins<15)return;const rem=lvl.required.filter(w=>!found.has(w));if(!rem.length)return;const word=rem[Math.floor(Math.random()*rem.length)],p=lvl.placements.find(x=>x.word===word);const hidden=[];for(let i=0;i<word.length;i++){const r=p.dir==='H'?p.row:p.row+i,c=p.dir==='H'?p.col+i:p.col,slot=document.getElementById(`sl-${r}-${c}`);if(slot&&!slot.classList.contains('revealed'))hidden.push({r,c,letter:word[i]});}if(!hidden.length)return;STATE.coins-=15;saveState();document.getElementById('gameCoins').textContent=STATE.coins;updateCoinsDisplay();const cell=hidden[Math.floor(Math.random()*hidden.length)],slot=document.getElementById(`sl-${cell.r}-${cell.c}`);slot.classList.add('revealed','t-'+lvl.theme);slot.textContent=cell.letter;}
 
 /* ── MODAL SWIPE ── */
 let modalStartY=0;
@@ -1689,6 +2239,7 @@ if(modalSheet){
 }
 
 buildCrossword();buildOrb();
+renderPlanetUI();
 </script>
 </body>
 </html>
